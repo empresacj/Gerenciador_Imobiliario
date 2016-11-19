@@ -1,0 +1,52 @@
+unit UStringFunctions;
+
+interface
+
+type
+  TStringFunctions = class
+  private
+    { private declarations }
+  protected
+    { protected declarations }
+  public
+    { public declarations }
+    function ExtractNotNumbers(Value: String): String;
+  published
+    { published declarations }
+    class function IsEmpty(const Value: String; Trim: Boolean = True): Boolean;
+  end;
+
+implementation
+
+uses
+  StrUtils, SysUtils;
+
+{ TStringFunctions }
+
+function TStringFunctions.ExtractNotNumbers(Value: String): String;
+var
+  i: integer;
+begin
+  i := 1;
+  while i <= Length(Text) do
+   begin
+    if not IsNumber(Text[i]) then
+     begin
+      Delete(Text, i, 1);
+      i := 0;
+     end;
+    Inc(i);
+   end;
+
+  Result := IfThen(IsFull(Text), Text);
+end;
+
+class function TStringFunctions.IsEmpty(const Value: String;
+  Trim: Boolean): Boolean;
+begin
+  if Trim then
+   Result := SysUtils.Trim(Value) = ''
+  else Result := Text = '';
+end;
+
+end.

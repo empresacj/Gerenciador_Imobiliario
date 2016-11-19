@@ -1,0 +1,67 @@
+unit UfrmMovimentacaoBancos;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Movimentacao, cxGraphics, cxControls,
+  cxLookAndFeels, cxLookAndFeelPainters, cxStyles, dxSkinsCore, dxSkinBlack,
+  dxSkinBlue, dxSkinBlueprint, dxSkinCaramel, dxSkinCoffee, dxSkinDarkRoom,
+  dxSkinDarkSide, dxSkinDevExpressDarkStyle, dxSkinDevExpressStyle, dxSkinFoggy,
+  dxSkinGlassOceans, dxSkinHighContrast, dxSkiniMaginary, dxSkinLilian,
+  dxSkinLiquidSky, dxSkinLondonLiquidSky, dxSkinMcSkin, dxSkinMetropolis,
+  dxSkinMetropolisDark, dxSkinMoneyTwins, dxSkinOffice2007Black,
+  dxSkinOffice2007Blue, dxSkinOffice2007Green, dxSkinOffice2007Pink,
+  dxSkinOffice2007Silver, dxSkinOffice2010Black, dxSkinOffice2010Blue,
+  dxSkinOffice2010Silver, dxSkinOffice2013DarkGray, dxSkinOffice2013LightGray,
+  dxSkinOffice2013White, dxSkinPumpkin, dxSkinSeven, dxSkinSevenClassic,
+  dxSkinSharp, dxSkinSharpPlus, dxSkinSilver, dxSkinSpringTime, dxSkinStardust,
+  dxSkinSummer2008, dxSkinTheAsphaltWorld, dxSkinsDefaultPainters,
+  dxSkinValentine, dxSkinVisualStudio2013Blue, dxSkinVisualStudio2013Dark,
+  dxSkinVisualStudio2013Light, dxSkinVS2010, dxSkinWhiteprint,
+  dxSkinXmas2008Blue, dxSkinscxPCPainter, cxCustomData, cxFilter, cxData,
+  cxDataStorage, cxEdit, cxNavigator, Data.DB, cxDBData, cxContainer, cxLabel,
+  Vcl.Buttons, cxGridLevel, cxClasses, cxGridCustomView, cxGridCustomTableView,
+  cxGridTableView, cxGridDBTableView, cxGrid, Vcl.ExtCtrls, Padrao, UPersistentObject;
+
+type
+  TfrmMovimentacaoBancos = class(TfrmMovimentacao)
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+  private
+    { Private declarations }
+  protected
+    { Protected declarations }
+    class function GetPersistentClass: TPersistentObjectClass; override;
+    class function GetFormClass: TfrmPadraoClass; override;
+  public
+    { Public declarations }
+  end;
+
+var
+  frmMovimentacaoBancos: TfrmMovimentacaoBancos;
+
+implementation
+
+uses
+  UBancos;
+
+{$R *.dfm}
+
+procedure TfrmMovimentacaoBancos.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+  frmMovimentacaoBancos := nil;
+  inherited;
+end;
+
+class function TfrmMovimentacaoBancos.GetFormClass: TfrmPadraoClass;
+begin
+
+end;
+
+class function TfrmMovimentacaoBancos.GetPersistentClass: TPersistentObjectClass;
+begin
+  Result := TBancos;
+end;
+
+end.

@@ -1,0 +1,23 @@
+unit UAgencia;
+
+interface
+
+uses
+  UPersistentObject, UAttribute;
+
+type
+  [TTableName('AGENCIAS')]
+  TAgencia = class(TPersistentObject)
+  private
+    { private declarations }
+  protected
+    { protected declarations }
+  public
+    { public declarations }
+  published
+    { published declarations }
+  end;
+
+implementation
+
+end.

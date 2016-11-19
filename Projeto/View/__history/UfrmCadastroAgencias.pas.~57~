@@ -1,0 +1,177 @@
+unit UfrmCadastroAgencias;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Padrao, cxGraphics, cxControls,
+  cxLookAndFeels, cxLookAndFeelPainters, cxContainer, cxEdit, dxSkinsCore,
+  dxSkinBlack, dxSkinBlue, dxSkinBlueprint, dxSkinCaramel, dxSkinCoffee,
+  dxSkinDarkRoom, dxSkinDarkSide, dxSkinDevExpressDarkStyle,
+  dxSkinDevExpressStyle, dxSkinFoggy, dxSkinGlassOceans, dxSkinHighContrast,
+  dxSkiniMaginary, dxSkinLilian, dxSkinLiquidSky, dxSkinLondonLiquidSky,
+  dxSkinMcSkin, dxSkinMetropolis, dxSkinMetropolisDark, dxSkinMoneyTwins,
+  dxSkinOffice2007Black, dxSkinOffice2007Blue, dxSkinOffice2007Green,
+  dxSkinOffice2007Pink, dxSkinOffice2007Silver, dxSkinOffice2010Black,
+  dxSkinOffice2010Blue, dxSkinOffice2010Silver, dxSkinOffice2013DarkGray,
+  dxSkinOffice2013LightGray, dxSkinOffice2013White, dxSkinPumpkin, dxSkinSeven,
+  dxSkinSevenClassic, dxSkinSharp, dxSkinSharpPlus, dxSkinSilver,
+  dxSkinSpringTime, dxSkinStardust, dxSkinSummer2008, dxSkinTheAsphaltWorld,
+  dxSkinsDefaultPainters, dxSkinValentine, dxSkinVisualStudio2013Blue,
+  dxSkinVisualStudio2013Dark, dxSkinVisualStudio2013Light, dxSkinVS2010,
+  dxSkinWhiteprint, dxSkinXmas2008Blue, cxLabel, Vcl.Buttons, Vcl.ExtCtrls,
+  dxBevel, UAgencia, cxTextEdit, cxMaskEdit, cxButtonEdit, cxGroupBox, UBanco,
+  cxCurrencyEdit, UCidade;
+
+type
+  TfrmCadastroAgencias = class(TfrmPadrao)
+    gpbBanco: TcxGroupBox;
+    btnCadastrarBanco: TSpeedButton;
+    bteBanco: TcxButtonEdit;
+    gpbNumero: TcxGroupBox;
+    cedNumero: TcxCurrencyEdit;
+    gpbNome: TcxGroupBox;
+    tedNome: TcxTextEdit;
+    gpbDigito: TcxGroupBox;
+    tedDigito: TcxTextEdit;
+    gpbEndereco: TcxGroupBox;
+    gpbNumeroEndereco: TcxGroupBox;
+    gpbBairro: TcxGroupBox;
+    gpbCidade: TcxGroupBox;
+    gpbEmail: TcxGroupBox;
+    tedEmail: TcxTextEdit;
+    tedNumero: TcxTextEdit;
+    tedEndereco: TcxTextEdit;
+    tedBairro: TcxTextEdit;
+    bteCidade: TcxButtonEdit;
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure bteBancoPropertiesButtonClick(Sender: TObject;
+      AButtonIndex: Integer);
+    procedure bteCidadePropertiesButtonClick(Sender: TObject;
+      AButtonIndex: Integer);
+  private
+    FObjBanco: TBanco;
+    FObjCidade: TCidade;
+    function GetObjAgencias: TAgencia;
+    { Private declarations }
+  protected
+    { Protected declarations }
+    procedure Inicializacao; override;
+    function LoadObject: Boolean; override;
+    function SaveObject: Boolean; override;
+    procedure Destruicao; override;
+  public
+    { Public declarations }
+    property ObjAgencias : TAgencia read GetObjAgencias;
+    property ObjBanco    : TBanco   read FObjBanco  write FObjBanco;
+    property ObjCidade   : TCidade  read FObjCidade write FObjCidade;
+  end;
+
+var
+  frmCadastroAgencias: TfrmCadastroAgencias;
+
+implementation
+
+uses
+  UClienteControle, UfrmDialogoPesquisa, UdmComuns;
+
+{$R *.dfm}
+
+procedure TfrmCadastroAgencias.bteBancoPropertiesButtonClick(Sender: TObject;
+  AButtonIndex: Integer);
+var
+  DisplayFields, ResultFields: TStringList;
+begin
+  inherited;
+  DisplayFields := ClienteControle.DisplayFields_CodigoBanco_NomeBanco_SiteBanco;
+  ResultFields  := ClienteControle.ResultFields_CodigoBanco_NomeBanco_SiteBanco;
+
+  if TfrmDialogoPesquisa.Execute('BANCOS', '', '', DisplayFields, ResultFields, ObjBanco) then
+   bteBanco.Text := Format('%d - %s', [ObjBanco.CodigoBanco, ObjBanco.NomeBanco]);
+end;
+
+procedure TfrmCadastroAgencias.bteCidadePropertiesButtonClick(Sender: TObject;
+  AButtonIndex: Integer);
+var
+  DisplayFields, ResultFields: TStringList;
+begin
+  inherited;
+  DisplayFields := ClienteControle.DisplayFields_Codigo_Nome;
+  ResultFields  := ClienteControle.ResultFields_CodigoCidade_NomeCidade;
+
+  if TfrmDialogoPesquisa.Execute('CIDADES', '', '', DisplayFields, ResultFields, ObjCidade) then
+   bteCidade.Text := ObjCidade.NomeCidade;
+end;
+
+procedure TfrmCadastroAgencias.Destruicao;
+begin
+  inherited;
+  ObjBanco.Free;
+  ObjCidade.Free;
+end;
+
+procedure TfrmCadastroAgencias.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+  frmCadastroAgencias := nil;
+  inherited;
+end;
+
+function TfrmCadastroAgencias.GetObjAgencias: TAgencia;
+begin
+  Result := Self.PersistentObject as TAgencia;
+end;
+
+procedure TfrmCadastroAgencias.Inicializacao;
+begin
+  inherited;
+  ObjBanco  := TBanco.Create(dmComuns.SQLConnection);
+  ObjCidade := TCidade.Create(dmComuns.SQLConnection);
+end;
+
+function TfrmCadastroAgencias.LoadObject: Boolean;
+begin
+  cedNumero.Value    := ObjAgencias.CodigoAgencia;
+  cedNumero.Enabled  := False;
+
+  if ObjBanco.Find(Format('IDBANCO = %d', [ObjAgencias.CodigoBanco])) then
+   begin
+    bteBanco.Text    := ObjBanco.NomeBanco;
+    bteBanco.Enabled := False;
+   end;
+
+  tedNome.Text       := ObjAgencias.NomeAgencia;
+  tedDigito.Text     := ObjAgencias.DigitoVerificador;
+  tedEndereco.Text   := ObjAgencias.Endereco;
+  tedNumero.Text     := ObjAgencias.Numero;
+  tedBairro.Text     := ObjAgencias.Bairro;
+
+  if ObjCidade.Find(Format('IDCIDADE = %d', [ObjAgencias.CodigoCidade])) then
+   bteCidade.Text    := ObjCidade.NomeCidade;
+
+  tedEmail.Text      := ObjAgencias.EmailAgencia;
+
+  Result := True;
+end;
+
+function TfrmCadastroAgencias.SaveObject: Boolean;
+begin
+  if ObjAgencias.New then
+   begin
+    ObjAgencias.CodigoAgencia   := cedNumero.Value;
+    ObjAgencias.CodigoBanco     := ObjBanco.CodigoBanco;
+   end;
+
+  ObjAgencias.NomeAgencia       := tedNome.Text;
+  ObjAgencias.DigitoVerificador := tedDigito.Text;
+  ObjAgencias.Endereco          := tedEndereco.Text;
+  ObjAgencias.Numero            := tedNumero.Text;
+  ObjAgencias.Bairro            := tedBairro.Text;
+  ObjAgencias.CodigoCidade      := ObjCidade.CodigoCidade;
+  ObjAgencias.EmailAgencia      := tedEmail.Text;
+
+  Result := inherited SaveObject;
+  StayOpen := not Result;
+end;
+
+end.

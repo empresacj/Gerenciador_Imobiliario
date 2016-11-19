@@ -1,0 +1,120 @@
+inherited frmMovimentacaoCidades: TfrmMovimentacaoCidades
+  Caption = 'Cadastro de Cidades'
+  PixelsPerInch = 96
+  TextHeight = 13
+  inherited Panel: TPanel
+    inherited grid: TcxGrid
+      inherited gridDBTableView: TcxGridDBTableView
+        object gridDBTableViewIDCIDADE: TcxGridDBColumn
+          Caption = 'C'#243'digo'
+          DataBinding.FieldName = 'IDCIDADE'
+          PropertiesClassName = 'TcxCurrencyEditProperties'
+          Properties.DisplayFormat = '#'
+        end
+        object gridDBTableViewNOMECIDADE: TcxGridDBColumn
+          Caption = 'Nome'
+          DataBinding.FieldName = 'NOMECIDADE'
+          PropertiesClassName = 'TcxTextEditProperties'
+        end
+        object gridDBTableViewNOMEESTADO: TcxGridDBColumn
+          Caption = 'Estado'
+          DataBinding.FieldName = 'NOMEESTADO'
+          PropertiesClassName = 'TcxTextEditProperties'
+        end
+      end
+    end
+  end
+  inherited PanelBotoes: TPanel
+    inherited lblInsert: TcxLabel
+      AnchorX = 29
+      AnchorY = 47
+    end
+    inherited lblEditar: TcxLabel
+      AnchorX = 29
+      AnchorY = 103
+    end
+    inherited lblDeletar: TcxLabel
+      AnchorX = 29
+      AnchorY = 159
+    end
+    inherited lblFechar: TcxLabel
+      AnchorX = 29
+      AnchorY = 382
+    end
+    inherited lblAjuda: TcxLabel
+      AnchorX = 29
+      AnchorY = 326
+    end
+    inherited lblExtras: TcxLabel
+      AnchorX = 29
+      AnchorY = 270
+    end
+    inherited lblStatus: TcxLabel
+      AnchorX = 29
+      AnchorY = 215
+    end
+  end
+  inherited dtsMovimentacao: TDataSource
+    DataSet = cdsMovimentacao
+  end
+  object cdsMovimentacao: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    ProviderName = 'dspMovimentacao'
+    Left = 522
+    Top = 32
+    object cdsMovimentacaoIDCIDADE: TIntegerField
+      FieldName = 'IDCIDADE'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object cdsMovimentacaoNOMECIDADE: TStringField
+      FieldName = 'NOMECIDADE'
+      Size = 100
+    end
+    object cdsMovimentacaoIDESTADO: TIntegerField
+      FieldName = 'IDESTADO'
+      Required = True
+    end
+    object cdsMovimentacaoNOMEESTADO: TStringField
+      FieldName = 'NOMEESTADO'
+      ProviderFlags = []
+      Required = True
+      Size = 80
+    end
+  end
+  object dspMovimentacao: TDataSetProvider
+    DataSet = sdsMovimentacao
+    Left = 458
+    Top = 32
+  end
+  object sdsMovimentacao: TSQLDataSet
+    CommandText = 
+      'SELECT '#13#10'        C.*,'#13#10'        E.NOMEESTADO'#13#10' FROM CIDADES C'#13#10'IN' +
+      'NER JOIN ESTADOS E ON C.IDESTADO = E.IDESTADO'
+    MaxBlobSize = -1
+    Params = <>
+    SQLConnection = dmComuns.SQLConnection
+    Left = 394
+    Top = 32
+    object sdsMovimentacaoIDCIDADE: TIntegerField
+      FieldName = 'IDCIDADE'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object sdsMovimentacaoNOMECIDADE: TStringField
+      FieldName = 'NOMECIDADE'
+      Size = 100
+    end
+    object sdsMovimentacaoIDESTADO: TIntegerField
+      FieldName = 'IDESTADO'
+      Required = True
+    end
+    object sdsMovimentacaoNOMEESTADO: TStringField
+      FieldName = 'NOMEESTADO'
+      ProviderFlags = []
+      Required = True
+      Size = 80
+    end
+  end
+end

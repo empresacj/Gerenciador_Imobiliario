@@ -1,0 +1,129 @@
+unit UDBFunctions;
+
+interface
+
+uses
+  DBClient, DB, SimpleDS, SqlExpr, Classes;
+
+type
+  TCustomSQLDataSetClass = class of TCustomSQLDataSet;
+
+  TDBFunctions = class
+  public
+    { Public declarations }
+    class procedure GetClientDataSet(DataSet: TDataSet; ClientDataSet: TClientDataSet); overload;
+  published
+    { Published declaration }
+    class function SQLDataSet(SQLDataSetClass: TCustomSQLDataSetClass;
+      SQLConnection: TSQLConnection): TCustomSQLDataSet;
+    class procedure DefineOrder(ClientDataSet: TClientDataSet; const Field: String;
+      const Shift: Boolean; const CheckDescField: Boolean = True); overload;
+    class function GetSequence(const Generator: String): Integer;
+  end;
+
+implementation
+
+uses
+  SysUtils, Provider, UdmComuns;
+
+{ TCdsFunctions }
+
+class procedure TDBFunctions.DefineOrder(ClientDataSet: TClientDataSet;
+  const Field: String; const Shift, CheckDescField: Boolean);
+const
+  IND_NAME = 'indTmp';
+var
+  ind: TIndexDef;
+  stl, stlDsc: TStringList;
+begin
+  if not Assigned(ClientDataSet) or (ClientDataSet.FieldByName(Field).FieldKind = fkLookup) then
+   Exit;
+
+  ClientDataSet.DisableControls;
+
+  ClientDataSet.IndexName := '';
+
+  stl    := TStringList.Create;
+  stlDsc := TStringList.Create;
+  stl.Delimiter    := ';';
+  stlDsc.Delimiter := ';';
+
+  if ClientDataSet.IndexDefs.IndexOf(IND_NAME) >= 0 then
+   begin
+    ind := ClientDataSet.IndexDefs.Find(IND_NAME);
+
+    stl.DelimitedText    := ind.Fields;
+    stlDsc.DelimitedText := ind.DescFields;
+
+    ClientDataSet.DeleteIndex(IND_NAME);
+   end ;
+
+  ClientDataSet.IndexDefs.Update;
+
+  ind      := ClientDataSet.IndexDefs.AddIndexDef;
+  ind.Name := IND_NAME;
+
+  if Shift then
+   begin
+    if (stl.IndexOf(Field) >= 0) then
+     begin
+      if (stlDsc.IndexOf(Field) = -1) then
+       stlDsc.Add(Field)
+      else
+       stlDsc.Delete(stlDsc.IndexOf(Field));
+
+      ind.DescFields := stlDsc.DelimitedText;
+     end
+    else stl.Add(Field);
+
+    ind.Fields := stl.DelimitedText;
+   end
+  else
+   begin
+    if CheckDescField and (stl.IndexOf(Field) >= 0) and (stlDsc.IndexOf(Field) = -1) then
+     ind.DescFields := Field
+    else ind.DescFields := '';
+
+    ind.Fields := Field;
+   end;
+
+  FreeAndNil(stl);
+  FreeAndNil(stlDsc);
+
+  ClientDataSet.EnableControls;
+  ClientDataSet.IndexName := ind.Name;
+end;
+
+class procedure TDBFunctions.GetClientDataSet(DataSet: TDataSet;
+  ClientDataSet: TClientDataSet);
+var
+  DataSetProvider: TDataSetProvider;
+begin
+  if ClientDataSet.Active then ClientDataSet.Close;
+  try
+   DataSetProvider         := TDataSetProvider.Create(nil);
+   DataSetProvider.DataSet := DataSet;
+   ClientDataSet.SetProvider(DataSetProvider);
+   ClientDataSet.Open;
+   ClientDataSet.SetProvider(nil);
+  finally
+   DataSetProvider.Free;
+  end;
+end;
+
+class function TDBFunctions.GetSequence(const Generator: String): Integer;
+var
+  ObjQry: TSQLQuery;
+begin
+  ObjQry := Self.SQLDataSet(TSQLQuery, )
+
+end;
+
+class function TDBFunctions.SQLDataSet(SQLDataSetClass: TCustomSQLDataSetClass;
+  SQLConnection: TSQLConnection): TCustomSQLDataSet;
+begin
+  Result := SQLDataSetClass.Create(nil);
+  Result.SQLConnection := SQLConnection;
+end;
+
+end.

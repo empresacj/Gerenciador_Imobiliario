@@ -1,0 +1,90 @@
+unit UfrmMovimentacaoCidades;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, UfrmMovimentacao, cxGraphics,
+  cxControls, cxLookAndFeels, cxLookAndFeelPainters, cxStyles, dxSkinsCore,
+  dxSkinBlack, dxSkinBlue, dxSkinBlueprint, dxSkinCaramel, dxSkinCoffee,
+  dxSkinDarkRoom, dxSkinDarkSide, dxSkinDevExpressDarkStyle,
+  dxSkinDevExpressStyle, dxSkinFoggy, dxSkinGlassOceans, dxSkinHighContrast,
+  dxSkiniMaginary, dxSkinLilian, dxSkinLiquidSky, dxSkinLondonLiquidSky,
+  dxSkinMcSkin, dxSkinMetropolis, dxSkinMetropolisDark, dxSkinMoneyTwins,
+  dxSkinOffice2007Black, dxSkinOffice2007Blue, dxSkinOffice2007Green,
+  dxSkinOffice2007Pink, dxSkinOffice2007Silver, dxSkinOffice2010Black,
+  dxSkinOffice2010Blue, dxSkinOffice2010Silver, dxSkinOffice2013DarkGray,
+  dxSkinOffice2013LightGray, dxSkinOffice2013White, dxSkinPumpkin, dxSkinSeven,
+  dxSkinSevenClassic, dxSkinSharp, dxSkinSharpPlus, dxSkinSilver,
+  dxSkinSpringTime, dxSkinStardust, dxSkinSummer2008, dxSkinTheAsphaltWorld,
+  dxSkinsDefaultPainters, dxSkinValentine, dxSkinVisualStudio2013Blue,
+  dxSkinVisualStudio2013Dark, dxSkinVisualStudio2013Light, dxSkinVS2010,
+  dxSkinWhiteprint, dxSkinXmas2008Blue, dxSkinscxPCPainter, cxCustomData,
+  cxFilter, cxData, cxDataStorage, cxEdit, cxNavigator, Data.DB, cxDBData,
+  cxContainer, cxLabel, Vcl.Buttons, cxGridLevel, cxClasses, cxGridCustomView,
+  cxGridCustomTableView, cxGridTableView, cxGridDBTableView, cxGrid,
+  Vcl.ExtCtrls, UPersistentObject, UfrmPadrao, Datasnap.DBClient, Data.FMTBcd,
+  Data.SqlExpr, Datasnap.Provider, cxCurrencyEdit, cxTextEdit;
+
+type
+  TfrmMovimentacaoCidades = class(TfrmMovimentacao)
+    cdsMovimentacao: TClientDataSet;
+    dspMovimentacao: TDataSetProvider;
+    sdsMovimentacao: TSQLDataSet;
+    sdsMovimentacaoIDCIDADE: TIntegerField;
+    sdsMovimentacaoNOMECIDADE: TStringField;
+    sdsMovimentacaoIDESTADO: TIntegerField;
+    sdsMovimentacaoNOMEESTADO: TStringField;
+    cdsMovimentacaoIDCIDADE: TIntegerField;
+    cdsMovimentacaoNOMECIDADE: TStringField;
+    cdsMovimentacaoIDESTADO: TIntegerField;
+    cdsMovimentacaoNOMEESTADO: TStringField;
+    gridDBTableViewIDCIDADE: TcxGridDBColumn;
+    gridDBTableViewNOMECIDADE: TcxGridDBColumn;
+    gridDBTableViewNOMEESTADO: TcxGridDBColumn;
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure cdsMovimentacaoAfterDelete(DataSet: TDataSet);
+  private
+    { Private declarations }
+  protected
+    { Protected declarations }
+    class function GetPersistentClass: TPersistentObjectClass; override;
+    class function GetFormClass: TfrmPadraoClass; override;
+  public
+    { Public declarations }
+  end;
+
+var
+  frmMovimentacaoCidades: TfrmMovimentacaoCidades;
+
+implementation
+
+uses
+  UCidade, UdmComuns;
+
+{$R *.dfm}
+
+procedure TfrmMovimentacaoCidades.cdsMovimentacaoAfterDelete(DataSet: TDataSet);
+begin
+  inherited;
+  cdsMovimentacao.ApplyUpdates(0);
+end;
+
+procedure TfrmMovimentacaoCidades.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+  frmMovimentacaoCidades := nil;
+  inherited;
+end;
+
+class function TfrmMovimentacaoCidades.GetFormClass: TfrmPadraoClass;
+begin
+  Result := TfrmPadrao;
+end;
+
+class function TfrmMovimentacaoCidades.GetPersistentClass: TPersistentObjectClass;
+begin
+  Result := TCidade;
+end;
+
+end.

@@ -1,0 +1,62 @@
+unit UControle;
+
+interface
+
+uses
+  SQLExpr, UPersistentObject, DBClient, Classes, UDBFunctions, SysUtils;
+
+type
+  TControle = class
+  private
+    FSQLConnection: TSQLConnection;
+    procedure SetSQLConnection(const Value: TSQLConnection); virtual;
+    { private declarations }
+  protected
+    { protected declarations }
+  public
+    { public declarations }
+    constructor Create(SQLConnection: TSQLConnection); virtual;
+    function BringCollectionToDataSet(const TableName, Filter: String; Sort: String = ''): TClientDataSet; overload; virtual;
+    property SQLConnection: TSQLConnection read FSQLConnection write SetSQLConnection;
+  published
+    { published declarations }
+  end;
+
+implementation
+
+{ TControle }
+
+function TControle.BringCollectionToDataSet(const TableName, Filter: String;
+  Sort: String): TClientDataSet;
+var
+  ObjQry: TSQLQuery;
+begin
+  Result := TClientDataSet.Create(nil);
+  ObjQry := TDBFunctions.SQLDataSet(TSQLQuery, Self.SQLConnection) as TSQLQuery;
+
+  try
+   ObjQry.SQL.Add(Format('SELECT * FROM %s', [TableName]));
+
+   if not SameText(Filter, '') then
+    ObjQry.SQL.Add(Format('WHERE %s', [Filter]));
+
+   if not SameText(Sort, '') then
+    ObjQry.SQL.Add(Format('ORDER BY %s', [Sort]));
+
+   TDBFunctions.GetClientDataSet(ObjQry, Result);
+  finally
+   ObjQry.Free;
+  end;
+end;
+
+constructor TControle.Create(SQLConnection: TSQLConnection);
+begin
+  FSQLConnection := SQLConnection;
+end;
+
+procedure TControle.SetSQLConnection(const Value: TSQLConnection);
+begin
+  FSQLConnection := Value;
+end;
+
+end.

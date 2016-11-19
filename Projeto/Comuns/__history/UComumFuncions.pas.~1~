@@ -1,0 +1,44 @@
+unit UComumFuncions;
+
+interface
+
+uses
+  Controls, Classes, Forms;
+
+type
+  TComumFuncions = class
+  private
+    { private declarations }
+  protected
+    { protected declarations }
+  public
+    { public declarations }
+    function  ExecForm(InstanceClass: TComponentClass; var Reference): Boolean;
+  published
+    { published declarations }
+  end;
+
+implementation
+
+{ TComumFuncions }
+
+function TComumFuncions.ExecForm(InstanceClass: TComponentClass;
+  var Reference): Boolean;
+begin
+  Result := False;
+
+  if TForm(Reference) = nil then
+   Application.CreateForm(InstanceClass, Reference);
+
+  if TForm(Reference).FormStyle = fsMDIChild then
+   begin
+    TForm(Reference).BorderStyle := bsSizeable;
+    TForm(Reference).BorderIcons := [biSystemMenu, biMaximize, biMinimize];
+    TForm(Reference).WindowState := wsMaximized;
+    TForm(Reference).Show;
+    Result := True;
+   end
+  else Result := TForm(Reference).ShowModal = mrOK;
+end;
+
+end.

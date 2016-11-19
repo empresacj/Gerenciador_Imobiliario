@@ -1,0 +1,97 @@
+unit UfrmPrincipalImobiliario;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, UfrmPrincipal, cxGraphics, cxControls,
+  cxLookAndFeels, cxLookAndFeelPainters, dxRibbonSkins, dxSkinsCore,
+  dxSkinBlack, dxSkinBlue, dxSkinBlueprint, dxSkinCaramel, dxSkinCoffee,
+  dxSkinDarkRoom, dxSkinDarkSide, dxSkinDevExpressDarkStyle,
+  dxSkinDevExpressStyle, dxSkinFoggy, dxSkinGlassOceans, dxSkinHighContrast,
+  dxSkiniMaginary, dxSkinLilian, dxSkinLiquidSky, dxSkinLondonLiquidSky,
+  dxSkinMcSkin, dxSkinMetropolis, dxSkinMetropolisDark, dxSkinMoneyTwins,
+  dxSkinOffice2007Black, dxSkinOffice2007Blue, dxSkinOffice2007Green,
+  dxSkinOffice2007Pink, dxSkinOffice2007Silver, dxSkinOffice2010Black,
+  dxSkinOffice2010Blue, dxSkinOffice2010Silver, dxSkinOffice2013DarkGray,
+  dxSkinOffice2013LightGray, dxSkinOffice2013White, dxSkinPumpkin, dxSkinSeven,
+  dxSkinSevenClassic, dxSkinSharp, dxSkinSharpPlus, dxSkinSilver,
+  dxSkinSpringTime, dxSkinStardust, dxSkinSummer2008, dxSkinTheAsphaltWorld,
+  dxSkinsDefaultPainters, dxSkinValentine, dxSkinVisualStudio2013Blue,
+  dxSkinVisualStudio2013Dark, dxSkinVisualStudio2013Light, dxSkinVS2010,
+  dxSkinWhiteprint, dxSkinXmas2008Blue, dxSkinsdxRibbonPainter,
+  dxRibbonCustomizationForm, cxContainer, cxEdit, dxSkinsdxBarPainter,
+  Vcl.ExtCtrls, dxScreenTip, dxBar, dxBarApplicationMenu, dxRibbon, dxSkinsForm,
+  System.ImageList, Vcl.ImgList, dxGDIPlusClasses, cxImage, dxStatusBar,
+  dxRibbonStatusBar, cxClasses, cxStyles, dxBarExtItems;
+
+type
+  TfrmPrincipalImobiliario = class(TfrmPrincipal)
+    rtbCadastro: TdxRibbonTab;
+    barCadastroGerais: TdxBar;
+    btnClientes: TdxBarLargeButton;
+    btnImoveis: TdxBarLargeButton;
+    btnCidades: TdxBarLargeButton;
+    barCadastroPorCliente: TdxBar;
+    dxBarSubItem1: TdxBarSubItem;
+    btnBancos: TdxBarLargeButton;
+    btnAgencias: TdxBarLargeButton;
+    procedure btnClientesClick(Sender: TObject);
+    procedure btnCidadesClick(Sender: TObject);
+    procedure btnBancosClick(Sender: TObject);
+  private
+    { Private declarations }
+  protected
+    { Protected declarations }
+    procedure MudarCliente(var Mensagem: TMessage); message WM_USER + 4;
+  public
+    { Public declarations }
+  end;
+
+var
+  frmPrincipalImobiliario: TfrmPrincipalImobiliario;
+
+implementation
+
+uses
+  UdmComuns, UfrmMovimentacaoCliente, UDBFunctions,
+  SqlExpr, UfrmMovimentacaoCidades;
+
+{$R *.dfm}
+
+procedure TfrmPrincipalImobiliario.btnBancosClick(Sender: TObject);
+begin
+  inherited;
+  dmComuns.ExecForm(TfrmMovimentacaoBancos, frmMovimentacaoBancos);
+end;
+
+procedure TfrmPrincipalImobiliario.btnCidadesClick(Sender: TObject);
+begin
+  inherited;
+  dmComuns.ExecForm(TfrmMovimentacaoCidades, frmMovimentacaoCidades);
+end;
+
+procedure TfrmPrincipalImobiliario.btnClientesClick(Sender: TObject);
+begin
+  inherited;
+  dmComuns.ExecForm(TfrmMovimentacaoCliente, frmMovimentacaoCliente);
+end;
+
+procedure TfrmPrincipalImobiliario.MudarCliente(var Mensagem: TMessage);
+var
+  ObjQry: TSQLQuery;
+begin
+  ObjQry := TDBFunctions.SQLDataSet(TSQLQuery, dmComuns.SQLConnection) as TSQLQuery;
+
+  try
+   ObjQry.SQL.Add('SELECT NOMECLIENTE FROM CLIENTES WHERE IDCLIENTE = :iCodCli');
+   ObjQry.Params.ParamByName('iCodCli').AsInteger := Mensagem.WParam;
+   ObjQry.Open;
+   dbeCliente.Text := ObjQry.FieldByName('NOMECLIENTE').AsString;
+  finally
+   ObjQry.Free;
+  end;
+end;
+
+end.

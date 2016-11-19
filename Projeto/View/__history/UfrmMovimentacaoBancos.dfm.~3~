@@ -1,0 +1,60 @@
+inherited frmMovimentacaoBancos: TfrmMovimentacaoBancos
+  Caption = 'Cadastro de Bancos'
+  ExplicitWidth = 731
+  ExplicitHeight = 431
+  PixelsPerInch = 96
+  TextHeight = 13
+  inherited PanelBotoes: TPanel
+    inherited lblInsert: TcxLabel
+      AnchorX = 29
+      AnchorY = 47
+    end
+    inherited lblEditar: TcxLabel
+      AnchorX = 29
+      AnchorY = 103
+    end
+    inherited lblDeletar: TcxLabel
+      AnchorX = 29
+      AnchorY = 159
+    end
+    inherited lblFechar: TcxLabel
+      AnchorX = 29
+      AnchorY = 382
+    end
+    inherited lblAjuda: TcxLabel
+      AnchorX = 29
+      AnchorY = 326
+    end
+    inherited lblExtras: TcxLabel
+      AnchorX = 29
+      AnchorY = 270
+    end
+    inherited lblStatus: TcxLabel
+      AnchorX = 29
+      AnchorY = 215
+    end
+  end
+  inherited dtsMovimentacao: TDataSource
+    DataSet = cdsMovimentacao
+  end
+  object sdsMovimentacao: TSQLDataSet
+    CommandText = 'SELECT * FROM BANCOS'#13#10'ORDER BY NOMEBANCO'
+    MaxBlobSize = -1
+    Params = <>
+    SQLConnection = dmComuns.SQLConnection
+    Left = 394
+    Top = 32
+  end
+  object dspMovimentacao: TDataSetProvider
+    DataSet = sdsMovimentacao
+    Left = 458
+    Top = 32
+  end
+  object cdsMovimentacao: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    ProviderName = 'dspMovimentacao'
+    Left = 522
+    Top = 32
+  end
+end

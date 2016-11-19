@@ -1,0 +1,30 @@
+unit UfrmTeste;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs;
+
+type
+  TfrmTeste = class(TForm)
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmTeste: TfrmTeste;
+
+implementation
+
+begin
+  frmTeste := TfrmTeste.Create;  (*Fine, constructor*)
+  Writeln(TfrmTeste.ClassName); (*Fine, class method*)
+  TfrmTeste.Destroy;            (*<-- Error message here*)
+end.
+
+{$R *.dfm}
+
+end.

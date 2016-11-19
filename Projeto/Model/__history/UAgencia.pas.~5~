@@ -1,0 +1,29 @@
+unit UAgencia;
+
+interface
+
+uses
+  UPersistentObject, UAttribute;
+
+type
+  [TTableName('AGENCIAS')]
+  TAgencia = class(TPersistentObject)
+  private
+    FCodigoAgencia: String;
+    FCodigoBanco: Integer;
+    { private declarations }
+  protected
+    { protected declarations }
+  public
+    { public declarations }
+  published
+    { published declarations }
+    [FieldName('CODIGOAGENCIA', True)]
+    property CodigoAgencia: String  read FCodigoAgencia write FCodigoAgencia;
+    [FieldName('IDBANCO', True, False, True)]
+    property CodigoBanco:   Integer read FCodigoBanco   write FCodigoBanco;
+  end;
+
+implementation
+
+end.

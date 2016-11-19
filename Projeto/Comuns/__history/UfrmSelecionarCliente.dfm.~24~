@@ -1,0 +1,103 @@
+object frmSelecionarCliente: TfrmSelecionarCliente
+  Left = 0
+  Top = 0
+  BorderStyle = bsNone
+  Caption = 'Selecionar Cliente'
+  ClientHeight = 250
+  ClientWidth = 600
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poScreenCenter
+  OnClose = FormClose
+  OnShow = FormShow
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Panel1: TPanel
+    Left = 0
+    Top = 0
+    Width = 600
+    Height = 250
+    Align = alClient
+    BevelInner = bvLowered
+    BevelWidth = 2
+    Caption = 'Panel'
+    ParentColor = True
+    TabOrder = 0
+    object grid: TcxGrid
+      Left = 5
+      Top = 31
+      Width = 592
+      Height = 219
+      TabOrder = 0
+      object gridDBTableView: TcxGridDBTableView
+        OnDblClick = gridDBTableViewDblClick
+        OnKeyUp = gridDBTableViewKeyUp
+        OnMouseUp = gridDBTableViewMouseUp
+        Navigator.Buttons.CustomButtons = <>
+        OnCustomDrawCell = gridDBTableViewCustomDrawCell
+        DataController.DataSource = dtsCliente
+        DataController.Summary.DefaultGroupSummaryItems = <>
+        DataController.Summary.FooterSummaryItems = <>
+        DataController.Summary.SummaryGroups = <>
+        OptionsBehavior.IncSearch = True
+        OptionsData.Deleting = False
+        OptionsData.DeletingConfirmation = False
+        OptionsData.Editing = False
+        OptionsData.Inserting = False
+        OptionsSelection.InvertSelect = False
+        OptionsView.NoDataToDisplayInfoText = 'N'#227'o h'#225' dados'
+        OptionsView.ColumnAutoWidth = True
+        OptionsView.GroupByBox = False
+        OptionsView.Indicator = True
+        OnColumnHeaderClick = gridDBTableViewColumnHeaderClick
+        object gridDBTableViewColumn1: TcxGridDBColumn
+          Caption = 'C'#243'digo'
+          PropertiesClassName = 'TcxCurrencyEditProperties'
+          Properties.DisplayFormat = '#'
+          Width = 67
+        end
+        object gridDBTableViewColumn2: TcxGridDBColumn
+          Caption = 'Nome'
+          DataBinding.FieldName = 'NOMCLI'
+          PropertiesClassName = 'TcxTextEditProperties'
+          Width = 372
+        end
+        object gridDBTableViewColumn3: TcxGridDBColumn
+          Caption = 'Inscri'#231#227'o'
+          DataBinding.FieldName = 'INSCLI'
+          PropertiesClassName = 'TcxTextEditProperties'
+          Width = 139
+        end
+      end
+      object gridLevel: TcxGridLevel
+        GridView = gridDBTableView
+      end
+    end
+  end
+  object ActionList: TActionList
+    Left = 80
+    Top = 72
+    object ActionListConfirm: TAction
+      OnExecute = ActionListConfirmExecute
+    end
+    object ActionListClose: TAction
+      OnExecute = ActionListCloseExecute
+    end
+  end
+  object cdsCliente: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    Left = 142
+    Top = 72
+  end
+  object dtsCliente: TDataSource
+    DataSet = cdsCliente
+    Left = 195
+    Top = 72
+  end
+end

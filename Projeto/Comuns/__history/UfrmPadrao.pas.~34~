@@ -1,0 +1,209 @@
+unit UfrmPadrao;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, UPersistentObject, DB;
+
+type
+  TfrmPadrao = class;
+  TfrmPadraoClass = class of TfrmPadrao;
+
+  TfrmPadrao = class(TForm)
+    procedure FormShow(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure FormCreate(Sender: TObject);
+  private
+    { Private declarations }
+    FState            : TDataSetState;
+    FDataSet          : TDataSet;
+    FStayOpen         : Boolean;
+    FTemDataSet       : Boolean;
+    FPersistentObject : TPersistentObject;
+    procedure SetDataSet(DataSet: TDataSet);
+  protected
+    { Protected declarations }
+    function LoadObject: Boolean; virtual; abstract;
+    function SaveObject: boolean; virtual;
+
+    procedure Inicializacao; virtual;
+    procedure Destruicao; virtual;
+  public
+    { Public declarations }
+    procedure ConfigurarComponentes; dynamic;
+
+    property State            : TDataSetState     read FState            write FState;
+    property DataSet          : TDataSet          read FDataSet          write SetDataSet;
+    property StayOpen         : Boolean           read FStayOpen         write FStayOpen;
+    property PersistentObject : TPersistentObject read FPersistentObject write FPersistentObject;
+  published
+    { Public declarations }
+    class function Execute(PersistentObject: TPersistentObject; DataSet: TDataSet; AOwner: TComponent = nil): Boolean; overload; virtual;
+  end;
+
+var
+  frmPadrao: TfrmPadrao;
+
+implementation
+
+{$R *.dfm}
+
+{ TfrmPadrao }
+
+procedure TfrmPadrao.ConfigurarComponentes;
+var
+  i: Integer;
+begin
+  for i := 0 to Owner.ComponentCount - 1 do
+   begin
+    // Resetando a cor dos group boxes
+    if Owner.Components[i] is TcxGroupBox then
+     TcxGroupBox(Owner.Components[i]).Style.RestoreDefaults;
+
+    // Adicionando o evento OnExit aos lookups
+    if ((Owner.Components[i] is TcxDBLookupComboBox) or
+        (Owner.Components[i] is TcxLookupComboBox) or
+        (Owner.Components[i] is TcxComboBox) or
+        (Owner.Components[i] is TcxDBComboBox)) and not BAssigned then
+       AssignExitEvent(Self.Components[i]);
+
+    // Checando se existe grid para retirar a seleção do grid.
+    if (Owner.Components[i] is TcxGridDBTableView) and Self.ConfigGrid then
+     begin
+      TcxGridDBTableView(Owner.Components[i]).OptionsSelection.HideSelection := True;
+      TcxGridDBTableView(Owner.Components[i]).OptionsSelection.HideFocusRectOnExit := TcxGridDBTableView(Owner.Components[i]).OptionsSelection.HideSelection;
+     end;
+
+    // Contando os componentes
+    if (((Owner.Components[i] is TWinControl)       and
+         (TWinControl(Owner.Components[i]).TabStop) and
+         (TWinControl(Owner.Components[i]).Enabled) and not
+         (Owner.Components[i] is TButtonControl))   or
+         (Owner.Components[i] is TFrame)            or
+         (Owner.Components[i] is TcxDBButtonEdit)   or
+         (Owner.Components[i] is TRadioGroup))      then
+     Inc(iQtdCmp);
+
+    if (Owner.Components[i] is TWinControl) then
+     if not TWinControl(Owner.Components[i]).Enabled then Continue;
+
+{1} if (Owner.Components[i].Tag > 0) and (Owner.Components[i].Tag < 20) then
+     begin
+      if (Owner.Components[i] is TFrame) then
+       Self.VerificarComponentes(Owner.Components[i]);
+{2}
+      if (TWinControl(Owner.Components[i]).Parent is TcxGroupBox) then
+       begin
+        if not((Owner.Components[i] is TcxCustomButtonEdit) or (Owner.Components[i] is TSpeedButton)) and IsPublishedProp(TcxCustomEditProperties(TcxTextEdit(owner.Components[i]).Properties), 'ReadOnly') then
+         if (GetOrdProp(TcxCustomEditProperties(TcxTextEdit(owner.Components[i]).Properties), 'ReadOnly') = 1) then
+          Continue;
+
+        // A cor dos GroupBoxes que armazenam campos obrigatórios e diferenciada
+        TcxGroupBox(TWinControl(Owner.Components[i]).Parent).Style.TextColor  := clMaroon;
+        TcxGroupBox(TWinControl(Owner.Components[i]).Parent).Style.Font.Color := clMaroon;
+
+        // Os indices dos componentes obrigatório são guardados nesta StringList. Para que mais tarde
+        // estes possam ser usados para setar o foco para o campo de preenchimento obrigatório.
+        stlComponent.AddObject(IntToStr(i), Owner.Components[i]);
+
+        if (Owner.Components[i] is TcxDBMaskEdit) or (Owner.Components[i] is TMaskEditN) or (Owner.Components[i] is TcxDateEdit) then
+         Self.AddControlToCheck(Owner.Components[i]);
+       end;{2}
+     end;{1}
+   end;
+end;
+
+procedure TfrmPadrao.Destruicao;
+begin
+//
+end;
+
+class function TfrmPadrao.Execute(PersistentObject: TPersistentObject;
+  DataSet: TDataSet; AOwner: TComponent): Boolean;
+var
+  ObjForm: TfrmPadrao;
+begin
+  ObjForm := Self.Create(AOwner);
+
+  try
+   ObjForm.PersistentObject := PersistentObject;
+   ObjForm.DataSet          := DataSet;
+
+   Result := ObjForm.ShowModal = mrOK;
+  finally
+   ObjForm.Free;
+  end;
+end;
+
+procedure TfrmPadrao.FormActivate(Sender: TObject);
+begin
+  if FTemDataSet then
+   if not(FDataSet.Active) then FDataSet.Open;
+end;
+
+procedure TfrmPadrao.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Self.Destruicao;
+  Release;
+  frmPadrao := nil;
+end;
+
+procedure TfrmPadrao.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  if FDataSet.State <> dsBrowse then btnCancelar.Click;
+
+  CanClose := FDataSet.State = dsBrowse;
+end;
+
+procedure TfrmPadrao.FormCreate(Sender: TObject);
+begin
+  FPersistentObject := nil;
+end;
+
+procedure TfrmPadrao.FormShow(Sender: TObject);
+begin
+  Self.Inicializacao;
+
+  if Assigned(Self.DataSet) and (Pos('[', Self.Caption) = 0) and not Assigned(Self.PersistentObject) then
+   Self.State := DataSet.State
+  else if Assigned(Self.PersistentObject) then
+   begin
+    if Self.PersistentObject.New then
+     Self.State := dsInsert
+    else
+     begin
+      Self.State := dsEdit;
+      Self.LoadObject;
+     end;
+   end;
+
+  case Self.State of
+   dsBrowse: Caption := Caption + ' - [Navegando]';
+   dsEdit  : Caption := Caption + ' - [Alterando]';
+   dsInsert: Caption := Caption + ' - [Inserindo]';
+  end;
+end;
+
+procedure TfrmPadrao.Inicializacao;
+begin
+//
+end;
+
+function TfrmPadrao.SaveObject: boolean;
+begin
+  Result := Self.PersistentObject.Save;
+
+  if Result and Assigned(Self.DataSet) then
+   Self.DataSet.Refresh;
+end;
+
+procedure TfrmPadrao.SetDataSet(DataSet: TDataSet);
+begin
+  FTemDataSet := DataSet <> nil;
+  FDataSet    := DataSet;
+end;
+
+end.

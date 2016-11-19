@@ -1,0 +1,39 @@
+unit UDialogFunctions;
+
+interface
+
+uses Windows, Classes;
+
+type
+  TDialogFunctions = class
+  private
+    { private declarations }
+  protected
+    { protected declarations }
+  public
+    { public declarations }
+  published
+    { published declarations }
+    class procedure Atenção(const Mensagem: String);
+    class function Pergunta(const Mensagem: String; Flags: Integer = MB_ICONQUESTION + MB_DEFBUTTON2): Boolean;
+  end;
+
+implementation
+
+uses
+  Forms, SysUtils;
+
+{ TDialogFunctions }
+
+class procedure TDialogFunctions.Atenção(const Mensagem: String);
+begin
+  Application.MessageBox(PChar(Mensagem), PChar(Format('%s - Atenção', [Application.Title])), MB_ICONWARNING + MB_OK);
+end;
+
+class function TDialogFunctions.Pergunta(const Mensagem: String;
+  Flags: Integer): Boolean;
+begin
+  Result := Application.MessageBox(PChar(Mensagem), PChar(Format('%s - Pergunta', [Application.Title])), MB_YESNO + Flags) = ID_YES;
+end;
+
+end.

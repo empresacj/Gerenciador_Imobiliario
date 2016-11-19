@@ -1,0 +1,117 @@
+unit UfrmPadrao;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, UPersistentObject, DB;
+
+type
+  TfrmPadrao = class;
+  TfrmPadraoClass = class of TfrmPadrao;
+
+  TfrmPadrao = class(TForm)
+    procedure FormShow(Sender: TObject);
+  private
+    { Private declarations }
+    FState            : TDataSetState;
+    FDataSet          : TDataSet;
+    FStayOpen         : Boolean;
+    FTemDataSet       : Boolean;
+    FPersistentObject : TPersistentObject;
+    procedure SetDataSet(DataSet: TDataSet);
+  protected
+    { Protected declarations }
+    function LoadObject: Boolean; virtual; abstract;
+    function SaveObject: boolean; virtual;
+
+    procedure Inicializacao; virtual;
+    procedure Destruicao; virtual;
+  public
+    { Public declarations }
+    procedure ConfigurarComponentes; dynamic;
+
+    property State            : TDataSetState     read FState            write FState;
+    property DataSet          : TDataSet          read FDataSet          write SetDataSet;
+    property StayOpen         : Boolean           read FStayOpen         write FStayOpen;
+    property PersistentObject : TPersistentObject read FPersistentObject write FPersistentObject;
+  published
+    { Public declarations }
+    class function Execute(PersistentObject: TPersistentObject; DataSet: TDataSet; AOwner: TComponent = nil): Boolean; overload; virtual;
+  end;
+
+var
+  frmPadrao: TfrmPadrao;
+
+implementation
+
+{$R *.dfm}
+
+{ TfrmPadrao }
+
+procedure TfrmPadrao.Destruicao;
+begin
+//
+end;
+
+class function TfrmPadrao.Execute(PersistentObject: TPersistentObject;
+  DataSet: TDataSet; AOwner: TComponent): Boolean;
+var
+  ObjForm: TfrmPadrao;
+begin
+  ObjForm := Self.Create(AOwner);
+
+  try
+   ObjForm.PersistentObject := PersistentObject;
+   ObjForm.DataSet          := DataSet;
+
+   Result := ObjForm.ShowModal = mrOK;
+  finally
+   ObjForm.Free;
+  end;
+end;
+
+procedure TfrmPadrao.FormShow(Sender: TObject);
+begin
+  Self.Inicializacao;
+
+  if Assigned(Self.DataSet) and (Pos('[', Self.Caption) = 0) and not Assigned(Self.PersistentObject) then
+   Self.State := DataSet.State
+  else if Assigned(Self.PersistentObject) then
+   begin
+    if Self.PersistentObject.New then
+     Self.State := dsInsert
+    else
+     begin
+      Self.State := dsEdit;
+      Self.LoadObject;
+     end;
+   end;
+
+  case Self.State of
+   dsBrowse: Caption := Caption + ' - [Navegando]';
+   dsEdit  : Caption := Caption + ' - [Alterando]';
+   dsInsert: Caption := Caption + ' - [Inserindo]';
+  end;
+end;
+
+procedure TfrmPadrao.Inicializacao;
+begin
+//
+end;
+
+function TfrmPadrao.SaveObject: boolean;
+begin
+  Result := Self.PersistentObject.Save;
+
+  if Result and Assigned(Self.DataSet) then
+   Self.DataSet.Refresh;
+end;
+
+procedure TfrmPadrao.SetDataSet(DataSet: TDataSet);
+begin
+  FTemDataSet := DataSet <> nil;
+  FDataSet    := DataSet;
+end;
+
+end.

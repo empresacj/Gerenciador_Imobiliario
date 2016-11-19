@@ -1,0 +1,16 @@
+unit UCdsFunctions;
+
+interface
+
+uses
+  DBClient, DB, SimpleDS;
+
+type
+  TCdsFunctions = class
+  public
+    class procedure GetClientDataSet(DataSet: TDataSet; ClientDataSet: TClientDataSet); overload;
+  end;
+
+implementation
+
+end.

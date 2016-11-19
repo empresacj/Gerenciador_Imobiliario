@@ -1,0 +1,176 @@
+unit UfrmPrincipal;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, System.ImageList, Vcl.ImgList,
+  cxGraphics, dxSkinsCore, dxSkinBlack, dxSkinBlue, dxSkinBlueprint,
+  dxSkinCaramel, dxSkinCoffee, dxSkinDarkRoom, dxSkinDarkSide,
+  dxSkinDevExpressDarkStyle, dxSkinDevExpressStyle, dxSkinFoggy,
+  dxSkinGlassOceans, dxSkinHighContrast, dxSkiniMaginary, dxSkinLilian,
+  dxSkinLiquidSky, dxSkinLondonLiquidSky, dxSkinMcSkin, dxSkinMetropolis,
+  dxSkinMetropolisDark, dxSkinMoneyTwins, dxSkinOffice2007Black,
+  dxSkinOffice2007Blue, dxSkinOffice2007Green, dxSkinOffice2007Pink,
+  dxSkinOffice2007Silver, dxSkinOffice2010Black, dxSkinOffice2010Blue,
+  dxSkinOffice2010Silver, dxSkinOffice2013DarkGray, dxSkinOffice2013LightGray,
+  dxSkinOffice2013White, dxSkinPumpkin, dxSkinSeven, dxSkinSevenClassic,
+  dxSkinSharp, dxSkinSharpPlus, dxSkinSilver, dxSkinSpringTime, dxSkinStardust,
+  dxSkinSummer2008, dxSkinTheAsphaltWorld, dxSkinsDefaultPainters,
+  dxSkinValentine, dxSkinVisualStudio2013Blue, dxSkinVisualStudio2013Dark,
+  dxSkinVisualStudio2013Light, dxSkinVS2010, dxSkinWhiteprint,
+  dxSkinXmas2008Blue, dxSkinsdxBarPainter, dxBar, dxBarApplicationMenu,
+  dxRibbon, cxLookAndFeels, dxSkinsForm, cxClasses, cxControls,
+  cxLookAndFeelPainters, dxRibbonSkins, dxSkinsdxRibbonPainter,
+  dxRibbonCustomizationForm, dxScreenTip, dxStatusBar, dxRibbonStatusBar,
+  cxContainer, cxEdit, dxGDIPlusClasses, cxImage, Vcl.ExtCtrls, dxBarExtItems,
+  cxTextEdit, cxMaskEdit, cxButtonEdit, cxStyles;
+
+type
+  TfrmPrincipal = class(TForm)
+    imlPequenas: TcxImageList;
+    imlGrandes: TcxImageList;
+    BarManager: TdxBarManager;
+    SkinController: TdxSkinController;
+    BarApplicationMenu: TdxBarApplicationMenu;
+    Ribbon: TdxRibbon;
+    BarScreenTipRepository: TdxBarScreenTipRepository;
+    sctAppButton: TdxBarScreenTip;
+    barQuick: TdxBar;
+    RibbonStatusBar: TdxRibbonStatusBar;
+    rscImagemHora: TdxStatusBarContainerControl;
+    rscImagemUsuario: TdxStatusBarContainerControl;
+    rscImagemVersao: TdxStatusBarContainerControl;
+    imgHora: TcxImage;
+    imgUsuario: TcxImage;
+    imgVersao: TcxImage;
+    Timer: TTimer;
+    bciBusca: TdxBarControlContainerItem;
+    StyleRepository: TcxStyleRepository;
+    Style: TcxStyle;
+    barMenu: TdxBar;
+    barSelecao: TdxBar;
+    btnSelecionarCliente: TdxBarButton;
+    dbeCliente: TdxBarEdit;
+    procedure TimerTimer(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormShow(Sender: TObject);
+    procedure dbeClienteEnter(Sender: TObject);
+    procedure btnSelecionarClienteClick(Sender: TObject);
+  private
+    FVersaoSistema: String;
+    { Private declarations }
+    procedure GetBuildInfo;
+    property VersaoSistema: String read FVersaoSistema write FVersaoSistema;
+  protected
+    { Protected declarations }
+    function SelecionarCliente: boolean; virtual;
+    procedure Inicializacao; virtual;
+  public
+    { Public declarations }
+  end;
+
+var
+  frmPrincipal: TfrmPrincipal;
+
+implementation
+
+uses
+  UDialogFunctions, UdmComuns, Math;
+
+{$R *.dfm}
+
+procedure TfrmPrincipal.btnSelecionarClienteClick(Sender: TObject);
+begin
+  if Self.SelecionarCliente then
+   btnSelecionarCliente.Click;
+end;
+
+procedure TfrmPrincipal.dbeClienteEnter(Sender: TObject);
+begin
+  if dmComuns.WindowsBar.ItemLinks.Count = 0 then
+   btnSelecionarCliente.Click;
+end;
+
+procedure TfrmPrincipal.FormClose(Sender: TObject; var Action: TCloseAction);
+var
+  indexForm: Integer;
+begin
+  if MDIChildCount > 0 then
+  begin
+    for indexForm := 0 to MDIChildCount - 1 do
+    begin
+      MDIChildren[0].Close;
+    end;
+  end;
+
+  Release;
+end;
+
+procedure TfrmPrincipal.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  CanClose := TDialogFunctions.Pergunta('Deseja realmente finalizar o sistema?', MB_ICONQUESTION);
+end;
+
+procedure TfrmPrincipal.FormShow(Sender: TObject);
+begin
+  Self.Inicializacao;
+end;
+
+procedure TfrmPrincipal.GetBuildInfo;
+var
+  VerInfoSize, VerValueSize, Dummy: DWORD;
+  VerInfo: Pointer;
+  VerValue: PVSFixedFileInfo;
+begin
+  VerInfoSize := GetFileVersionInfoSize(PChar(ParamStr(0)), Dummy);
+  if VerInfoSize > 0 then
+  begin
+      GetMem(VerInfo, VerInfoSize);
+      try
+        if GetFileVersionInfo(PChar(ParamStr(0)), 0, VerInfoSize, VerInfo) then
+        begin
+          VerQueryValue(VerInfo, '\', Pointer(VerValue), VerValueSize);
+          with VerValue^ do
+           VersaoSistema := IntToStr(dwFileVersionMS shr 16)    + '.' +
+                            IntToStr(dwFileVersionMS and $FFFF) + '.' +
+                            IntToStr(dwFileVersionLS shr 16)    + '.' +
+                            IntToStr(dwFileVersionLS and $FFFF);
+        end;
+      finally
+        FreeMem(VerInfo, VerInfoSize);
+      end;
+  end;
+end;
+
+procedure TfrmPrincipal.Inicializacao;
+begin
+  GetBuildInfo;
+  RibbonStatusBar.Panels[5].Text := 'Versão do Sistema: ' + VersaoSistema;
+end;
+
+function TfrmPrincipal.SelecionarCliente: boolean;
+var
+  aRect: TRect;
+begin
+  // Bloqueando seleção de empresa se tiver algum form MDI aberto
+  Result := False;
+
+  if dmComuns.WindowsBar.ItemLinks.Count > 1 then
+   begin
+    ActiveControl := nil;
+    Exit;
+   end;
+
+  if TFormFunctions.GetCurrentWindowRect(aRect) then
+   Result := Self.DoSelectCompany(Point(aRect.Left, aRect.Top - 5));
+end;
+
+procedure TfrmPrincipal.TimerTimer(Sender: TObject);
+begin
+  RibbonStatusBar.Panels[1].Text := 'Hora: ' + TimeToStr(Time);
+end;
+
+end.

@@ -1,0 +1,226 @@
+inherited frmMovimentacaoAgencias: TfrmMovimentacaoAgencias
+  Caption = 'Cadastro de Ag'#234'ncias'
+  ExplicitWidth = 731
+  ExplicitHeight = 431
+  PixelsPerInch = 96
+  TextHeight = 13
+  inherited Panel: TPanel
+    inherited grid: TcxGrid
+      inherited gridDBTableView: TcxGridDBTableView
+        object gridDBTableViewNOMEBANCO: TcxGridDBColumn
+          Caption = 'Banco'
+          DataBinding.FieldName = 'NOMEBANCO'
+          PropertiesClassName = 'TcxTextEditProperties'
+          Width = 83
+        end
+        object gridDBTableViewCODIGOAGENCIA: TcxGridDBColumn
+          Caption = 'N'#250'mero Ag'#234'ncia'
+          DataBinding.FieldName = 'CODIGOAGENCIA'
+          PropertiesClassName = 'TcxCurrencyEditProperties'
+          Properties.DisplayFormat = '#'
+          Width = 46
+        end
+        object gridDBTableViewNOMEAGENCIA: TcxGridDBColumn
+          Caption = 'Nome'
+          DataBinding.FieldName = 'NOMEAGENCIA'
+          PropertiesClassName = 'TcxTextEditProperties'
+          Width = 109
+        end
+        object gridDBTableViewEMAILAGENCIA: TcxGridDBColumn
+          Caption = 'Email'
+          DataBinding.FieldName = 'EMAILAGENCIA'
+          PropertiesClassName = 'TcxTextEditProperties'
+          Width = 69
+        end
+        object gridDBTableViewENDERECOAGENCIA: TcxGridDBColumn
+          Caption = 'Endere'#231'o'
+          DataBinding.FieldName = 'ENDERECOAGENCIA'
+          PropertiesClassName = 'TcxTextEditProperties'
+          Width = 68
+        end
+        object gridDBTableViewNUMEROAGENCIA: TcxGridDBColumn
+          Caption = 'N'#250'mero'
+          DataBinding.FieldName = 'NUMEROAGENCIA'
+          PropertiesClassName = 'TcxTextEditProperties'
+          Width = 21
+        end
+        object gridDBTableViewBAIRROAGENCIA: TcxGridDBColumn
+          Caption = 'Bairro'
+          DataBinding.FieldName = 'BAIRROAGENCIA'
+          PropertiesClassName = 'TcxTextEditProperties'
+          Width = 109
+        end
+        object gridDBTableViewNOMECIDADE: TcxGridDBColumn
+          Caption = 'Cidade'
+          DataBinding.FieldName = 'NOMECIDADE'
+          PropertiesClassName = 'TcxTextEditProperties'
+          Width = 136
+        end
+      end
+    end
+  end
+  inherited PanelBotoes: TPanel
+    inherited lblInsert: TcxLabel
+      AnchorX = 29
+      AnchorY = 47
+    end
+    inherited lblEditar: TcxLabel
+      AnchorX = 29
+      AnchorY = 103
+    end
+    inherited lblDeletar: TcxLabel
+      AnchorX = 29
+      AnchorY = 159
+    end
+    inherited lblFechar: TcxLabel
+      AnchorX = 29
+      AnchorY = 382
+    end
+    inherited lblAjuda: TcxLabel
+      AnchorX = 29
+      AnchorY = 326
+    end
+    inherited lblExtras: TcxLabel
+      AnchorX = 29
+      AnchorY = 270
+    end
+    inherited lblStatus: TcxLabel
+      AnchorX = 29
+      AnchorY = 215
+    end
+  end
+  inherited dtsMovimentacao: TDataSource
+    DataSet = cdsMovimentacao
+  end
+  object sdsMovimentacao: TSQLDataSet
+    CommandText = 
+      'SELECT'#13#10'    A.*,'#13#10'    B.NOMEBANCO,'#13#10'    C.NOMECIDADE'#13#10'FROM AGENC' +
+      'IAS A INNER JOIN BANCOS  B ON A.IDBANCO  = B.IDBANCO'#13#10'          ' +
+      '                      INNER JOIN CIDADES C ON A.IDCIDADE = C.IDC' +
+      'IDADE'#13#10'ORDER BY A.IDBANCO'
+    MaxBlobSize = -1
+    Params = <>
+    SQLConnection = dmComuns.SQLConnection
+    Left = 394
+    Top = 32
+    object sdsMovimentacaoCODIGOAGENCIA: TStringField
+      FieldName = 'CODIGOAGENCIA'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+      Size = 10
+    end
+    object sdsMovimentacaoIDBANCO: TIntegerField
+      FieldName = 'IDBANCO'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object sdsMovimentacaoNOMEAGENCIA: TStringField
+      FieldName = 'NOMEAGENCIA'
+      Required = True
+      Size = 80
+    end
+    object sdsMovimentacaoDIGITOVERIFICADORAGENCIA: TStringField
+      FieldName = 'DIGITOVERIFICADORAGENCIA'
+      FixedChar = True
+      Size = 1
+    end
+    object sdsMovimentacaoENDERECOAGENCIA: TStringField
+      FieldName = 'ENDERECOAGENCIA'
+      Required = True
+      Size = 50
+    end
+    object sdsMovimentacaoNUMEROAGENCIA: TStringField
+      FieldName = 'NUMEROAGENCIA'
+      Size = 10
+    end
+    object sdsMovimentacaoBAIRROAGENCIA: TStringField
+      FieldName = 'BAIRROAGENCIA'
+      Required = True
+      Size = 80
+    end
+    object sdsMovimentacaoIDCIDADE: TIntegerField
+      FieldName = 'IDCIDADE'
+    end
+    object sdsMovimentacaoEMAILAGENCIA: TStringField
+      FieldName = 'EMAILAGENCIA'
+      Size = 50
+    end
+    object sdsMovimentacaoNOMEBANCO: TStringField
+      FieldName = 'NOMEBANCO'
+      ProviderFlags = []
+      Required = True
+      Size = 100
+    end
+    object sdsMovimentacaoNOMECIDADE: TStringField
+      FieldName = 'NOMECIDADE'
+      ProviderFlags = []
+      Size = 100
+    end
+  end
+  object dspMovimentacao: TDataSetProvider
+    DataSet = sdsMovimentacao
+    Left = 458
+    Top = 32
+  end
+  object cdsMovimentacao: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    ProviderName = 'dspMovimentacao'
+    AfterDelete = cdsMovimentacaoAfterDelete
+    Left = 522
+    Top = 32
+    object cdsMovimentacaoCODIGOAGENCIA: TStringField
+      FieldName = 'CODIGOAGENCIA'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+      Size = 10
+    end
+    object cdsMovimentacaoIDBANCO: TIntegerField
+      FieldName = 'IDBANCO'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object cdsMovimentacaoNOMEAGENCIA: TStringField
+      FieldName = 'NOMEAGENCIA'
+      Required = True
+      Size = 80
+    end
+    object cdsMovimentacaoDIGITOVERIFICADORAGENCIA: TStringField
+      FieldName = 'DIGITOVERIFICADORAGENCIA'
+      FixedChar = True
+      Size = 1
+    end
+    object cdsMovimentacaoENDERECOAGENCIA: TStringField
+      FieldName = 'ENDERECOAGENCIA'
+      Required = True
+      Size = 50
+    end
+    object cdsMovimentacaoNUMEROAGENCIA: TStringField
+      FieldName = 'NUMEROAGENCIA'
+      Size = 10
+    end
+    object cdsMovimentacaoBAIRROAGENCIA: TStringField
+      FieldName = 'BAIRROAGENCIA'
+      Required = True
+      Size = 80
+    end
+    object cdsMovimentacaoIDCIDADE: TIntegerField
+      FieldName = 'IDCIDADE'
+    end
+    object cdsMovimentacaoEMAILAGENCIA: TStringField
+      FieldName = 'EMAILAGENCIA'
+      Size = 50
+    end
+    object cdsMovimentacaoNOMEBANCO: TStringField
+      FieldName = 'NOMEBANCO'
+      ProviderFlags = []
+      Required = True
+      Size = 100
+    end
+    object cdsMovimentacaoNOMECIDADE: TStringField
+      FieldName = 'NOMECIDADE'
+      ProviderFlags = []
+      Size = 100
+    end
+  end
+end

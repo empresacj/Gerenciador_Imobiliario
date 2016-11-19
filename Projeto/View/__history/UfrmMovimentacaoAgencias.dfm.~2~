@@ -1,0 +1,161 @@
+inherited frmMovimentacaoAgencias: TfrmMovimentacaoAgencias
+  Caption = 'Cadastro de Ag'#234'ncias'
+  ExplicitWidth = 731
+  ExplicitHeight = 431
+  PixelsPerInch = 96
+  TextHeight = 13
+  inherited Panel: TPanel
+    inherited grid: TcxGrid
+      ExplicitLeft = 2
+      ExplicitTop = 0
+    end
+  end
+  inherited PanelBotoes: TPanel
+    inherited lblInsert: TcxLabel
+      AnchorX = 29
+      AnchorY = 47
+    end
+    inherited lblEditar: TcxLabel
+      AnchorX = 29
+      AnchorY = 103
+    end
+    inherited lblDeletar: TcxLabel
+      AnchorX = 29
+      AnchorY = 159
+    end
+    inherited lblFechar: TcxLabel
+      AnchorX = 29
+      AnchorY = 382
+    end
+    inherited lblAjuda: TcxLabel
+      AnchorX = 29
+      AnchorY = 326
+    end
+    inherited lblExtras: TcxLabel
+      AnchorX = 29
+      AnchorY = 270
+    end
+    inherited lblStatus: TcxLabel
+      AnchorX = 29
+      AnchorY = 215
+    end
+  end
+  object sdsMovimentacao: TSQLDataSet
+    CommandText = 
+      'SELECT'#13#10'    A.*,'#13#10'    B.NOMEBANCO'#13#10'FROM AGENCIAS A INNER JOIN BA' +
+      'NCOS B ON A.IDBANCO = B.IDBANCO'#13#10'ORDER BY A.IDBANCO'
+    MaxBlobSize = -1
+    Params = <>
+    SQLConnection = dmComuns.SQLConnection
+    Left = 394
+    Top = 32
+    object sdsMovimentacaoCODIGOAGENCIA: TStringField
+      FieldName = 'CODIGOAGENCIA'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+      Size = 10
+    end
+    object sdsMovimentacaoIDBANCO: TIntegerField
+      FieldName = 'IDBANCO'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object sdsMovimentacaoNOMEAGENCIA: TStringField
+      FieldName = 'NOMEAGENCIA'
+      Required = True
+      Size = 80
+    end
+    object sdsMovimentacaoDIGITOVERIFICADORAGENCIA: TStringField
+      FieldName = 'DIGITOVERIFICADORAGENCIA'
+      FixedChar = True
+      Size = 1
+    end
+    object sdsMovimentacaoENDERECOAGENCIA: TStringField
+      FieldName = 'ENDERECOAGENCIA'
+      Required = True
+      Size = 50
+    end
+    object sdsMovimentacaoNUMEROAGENCIA: TStringField
+      FieldName = 'NUMEROAGENCIA'
+      Size = 10
+    end
+    object sdsMovimentacaoBAIRROAGENCIA: TStringField
+      FieldName = 'BAIRROAGENCIA'
+      Required = True
+      Size = 80
+    end
+    object sdsMovimentacaoIDCIDADE: TIntegerField
+      FieldName = 'IDCIDADE'
+    end
+    object sdsMovimentacaoEMAILAGENCIA: TStringField
+      FieldName = 'EMAILAGENCIA'
+      Size = 50
+    end
+    object sdsMovimentacaoNOMEBANCO: TStringField
+      FieldName = 'NOMEBANCO'
+      ProviderFlags = []
+      Required = True
+      Size = 100
+    end
+  end
+  object dspMovimentacao: TDataSetProvider
+    DataSet = sdsMovimentacao
+    Left = 458
+    Top = 32
+  end
+  object cdsMovimentacao: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    ProviderName = 'dspMovimentacao'
+    Left = 522
+    Top = 32
+    object cdsMovimentacaoCODIGOAGENCIA: TStringField
+      FieldName = 'CODIGOAGENCIA'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+      Size = 10
+    end
+    object cdsMovimentacaoIDBANCO: TIntegerField
+      FieldName = 'IDBANCO'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object cdsMovimentacaoNOMEAGENCIA: TStringField
+      FieldName = 'NOMEAGENCIA'
+      Required = True
+      Size = 80
+    end
+    object cdsMovimentacaoDIGITOVERIFICADORAGENCIA: TStringField
+      FieldName = 'DIGITOVERIFICADORAGENCIA'
+      FixedChar = True
+      Size = 1
+    end
+    object cdsMovimentacaoENDERECOAGENCIA: TStringField
+      FieldName = 'ENDERECOAGENCIA'
+      Required = True
+      Size = 50
+    end
+    object cdsMovimentacaoNUMEROAGENCIA: TStringField
+      FieldName = 'NUMEROAGENCIA'
+      Size = 10
+    end
+    object cdsMovimentacaoBAIRROAGENCIA: TStringField
+      FieldName = 'BAIRROAGENCIA'
+      Required = True
+      Size = 80
+    end
+    object cdsMovimentacaoIDCIDADE: TIntegerField
+      FieldName = 'IDCIDADE'
+    end
+    object cdsMovimentacaoEMAILAGENCIA: TStringField
+      FieldName = 'EMAILAGENCIA'
+      Size = 50
+    end
+    object cdsMovimentacaoNOMEBANCO: TStringField
+      FieldName = 'NOMEBANCO'
+      ProviderFlags = []
+      Required = True
+      Size = 100
+    end
+  end
+end

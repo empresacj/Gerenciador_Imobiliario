@@ -1,0 +1,46 @@
+unit UClienteControle;
+
+interface
+
+uses
+  Classes, UControle, SQLExpr, DBClient, SysUtils;
+
+type
+  TClienteControle = class(TControle)
+  private
+    { private declarations }
+  protected
+    { protected declarations }
+  public
+    { public declarations }
+    function GetCollectionTelefonesCliente(const CodigoCliente: Integer): TClientDataSet;
+    function GetCollectionTipoLogradouro: TClientDataSet;
+  published
+    { published declarations }
+  end;
+
+var
+  ClienteControle: TClienteControle;
+
+implementation
+
+{ TClienteControle }
+
+function TClienteControle.GetCollectionTelefonesCliente(
+  const CodigoCliente: Integer): TClientDataSet;
+begin
+  Result := inherited BringCollectionToDataSet('TELEFONES', Format('IDCLIENTE = %d',[CodigoCliente]));
+end;
+
+function TClienteControle.GetCollectionTipoLogradouro: TClientDataSet;
+begin
+  Result := inherited BringCollectionToDataSet('TIPOLOGRADOURO');
+end;
+
+initialization
+  ClienteControle := TClienteControle.Create(nil);
+
+finalization
+  ClienteControle.Free;
+
+end.

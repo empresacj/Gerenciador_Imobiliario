@@ -1,0 +1,137 @@
+unit UfrmLogin;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, cxGraphics, cxControls, cxLookAndFeels,
+  cxLookAndFeelPainters, cxContainer, cxEdit, dxSkinsCore, dxSkinBlack,
+  dxSkinBlue, dxSkinBlueprint, dxSkinCaramel, dxSkinCoffee, dxSkinDarkRoom,
+  dxSkinDarkSide, dxSkinDevExpressDarkStyle, dxSkinDevExpressStyle, dxSkinFoggy,
+  dxSkinGlassOceans, dxSkinHighContrast, dxSkiniMaginary, dxSkinLilian,
+  dxSkinLiquidSky, dxSkinLondonLiquidSky, dxSkinMcSkin, dxSkinMetropolis,
+  dxSkinMetropolisDark, dxSkinMoneyTwins, dxSkinOffice2007Black,
+  dxSkinOffice2007Blue, dxSkinOffice2007Green, dxSkinOffice2007Pink,
+  dxSkinOffice2007Silver, dxSkinOffice2010Black, dxSkinOffice2010Blue,
+  dxSkinOffice2010Silver, dxSkinOffice2013DarkGray, dxSkinOffice2013LightGray,
+  dxSkinOffice2013White, dxSkinPumpkin, dxSkinSeven, dxSkinSevenClassic,
+  dxSkinSharp, dxSkinSharpPlus, dxSkinSilver, dxSkinSpringTime, dxSkinStardust,
+  dxSkinSummer2008, dxSkinTheAsphaltWorld, dxSkinsDefaultPainters,
+  dxSkinValentine, dxSkinVisualStudio2013Blue, dxSkinVisualStudio2013Dark,
+  dxSkinVisualStudio2013Light, dxSkinVS2010, dxSkinWhiteprint,
+  dxSkinXmas2008Blue, Vcl.Buttons, cxTextEdit, cxGroupBox, dxGDIPlusClasses,
+  Vcl.ExtCtrls;
+
+type
+  TfrmLogin = class(TForm)
+    imgLogin: TImage;
+    gpbUsuario: TcxGroupBox;
+    tedUsuario: TcxTextEdit;
+    gpbSenha: TcxGroupBox;
+    tedSenha: TcxTextEdit;
+    btnAcessar: TSpeedButton;
+    btnEsqueci: TSpeedButton;
+    btnCancelar: TSpeedButton;
+    procedure btnCancelarClick(Sender: TObject);
+    procedure btnAcessarClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure tedUsuarioKeyPress(Sender: TObject; var Key: Char);
+  private
+    { Private declarations }
+    function Acessar(const Login, Senha: String): Boolean;
+  public
+    { Public declarations }
+    class function Login: Boolean;
+  end;
+
+var
+  frmLogin: TfrmLogin;
+  iTentativas: Integer;
+
+implementation
+
+uses
+  UDialogFunctions, UdmComuns, SQLExpr, UDBFunctions;
+
+{$R *.dfm}
+
+{ TfrmLogin }
+
+function TfrmLogin.Acessar(const Login, Senha: String): Boolean;
+var
+  ObjQry: TSQLQuery;
+begin
+  inherited;
+  ObjQry := TDBFunctions.SQLDataSet(TSQLQuery, dmComuns.SQLConnection) as TSQLQuery;
+  Result := False;
+
+  try
+   ObjQry.SQL.Add(' SELECT COUNT(*) FROM USUARIOS ');
+   ObjQry.SQL.Add(' WHERE LOGINUSUARIO  = :sLogin ');
+   ObjQry.SQL.Add('   AND SENHAACESSO   = :sSenha ');
+   ObjQry.SQL.Add('   AND STATUSUSUARIO = ''A''   ');
+   ObjQry.Params.ParamByName('sLogin').AsString := Login;
+   ObjQry.Params.ParamByName('sSenha').AsString := Senha;
+   ObjQry.Open;
+
+   if ObjQry.Fields[0].AsInteger > 0 then
+    Result := True;
+
+  finally
+   ObjQry.Free;
+  end;
+end;
+
+procedure TfrmLogin.btnAcessarClick(Sender: TObject);
+begin
+  if Self.Acessar(tedUsuario.Text, tedSenha.Text) then
+   Self.ModalResult := mrOk
+  else
+   begin
+    iTentativas := iTentativas + 1;
+
+    if iTentativas = 3 then
+     begin
+      TDialogFunctions.Erro('Não foi possível conectar. Número limite de tentativas atigindo.');
+      btnCancelar.Click;
+     end
+    else TDialogFunctions.Atencao('Não foi possível conectar. Por favor verifique o usuário e senha digitados e tente novamente.');
+   end;
+end;
+
+procedure TfrmLogin.btnCancelarClick(Sender: TObject);
+begin
+  Self.ModalResult := mrCancel;
+end;
+
+procedure TfrmLogin.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  frmLogin := nil;
+end;
+
+procedure TfrmLogin.FormShow(Sender: TObject);
+begin
+  iTentativas := 0;
+end;
+
+class function TfrmLogin.Login: Boolean;
+var
+  ObjForm: TfrmLogin;
+begin
+  ObjForm := Self.Create(nil);
+
+  try
+   Result := ObjForm.ShowModal = mrOK;
+  finally
+   ObjForm.Free;
+  end;
+end;
+
+procedure TfrmLogin.tedUsuarioKeyPress(Sender: TObject; var Key: Char);
+begin
+  IF Key = #13 THEN
+   Perform(WM_NEXTDLGCTL,0,0);
+end;
+
+end.

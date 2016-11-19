@@ -1,0 +1,37 @@
+unit UCdsFunctions;
+
+interface
+
+uses
+  DBClient, DB, SimpleDS;
+
+type
+  TCdsFunctions = class
+  public
+    class procedure GetClientDataSet(DataSet: TDataSet; ClientDataSet: TClientDataSet); overload;
+  end;
+
+implementation
+
+uses Classes, SysUtils, Provider;
+
+{ TCdsFunctions }
+
+class procedure TCdsFunctions.GetClientDataSet(DataSet: TDataSet;
+  ClientDataSet: TClientDataSet);
+var
+  DataSetProvider: TDataSetProvider;
+begin
+  if ClientDataSet.Active then ClientDataSet.Close;
+  try
+   DataSetProvider         := TDataSetProvider.Create(nil);
+   DataSetProvider.DataSet := DataSet;
+   ClientDataSet.SetProvider(DataSetProvider);
+   ClientDataSet.Open;
+   ClientDataSet.SetProvider(nil);
+  finally
+   DataSetProvider.Free;
+  end;
+end;
+
+end.

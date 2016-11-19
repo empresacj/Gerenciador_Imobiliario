@@ -1,0 +1,9 @@
+object dmComuns: TdmComuns
+  OldCreateOrder = False
+  Height = 150
+  Width = 215
+  object SQLConnection: TSQLConnection
+    Left = 88
+    Top = 40
+  end
+end

@@ -1,0 +1,35 @@
+unit UTelefone;
+
+interface
+
+uses
+  UPersistentObject, UAttribute;
+
+type
+  [TTableName('TELEFONES')]
+  TTelefone = class(TPersistentObject)
+  private
+    FCodigoTelefon: Integer;
+    FTipoTelefone: String;
+    FNumeroTelefone: String;
+    FCodigoCliente: Integer;
+    FCodigoAgencia: String;
+    FCodigoBanco: Integer;
+    { private declarations }
+  protected
+    { protected declarations }
+  public
+    { public declarations }
+  published
+    { published declarations }
+    property CodigoTelefon:  Integer read FCodigoTelefon  write FCodigoTelefon;
+    property TipoTelefone:   String  read FTipoTelefone   write FTipoTelefone;
+    property NumeroTelefone: String  read FNumeroTelefone write FNumeroTelefone;
+    property CodigoCliente:  Integer read FCodigoCliente  write FCodigoCliente;
+    property CodigoAgencia:  String  read FCodigoAgencia  write FCodigoAgencia;
+    property CodigoBanco:    Integer read FCodigoBanco    write FCodigoBanco;
+  end;
+
+implementation
+
+end.

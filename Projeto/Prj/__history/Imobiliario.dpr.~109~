@@ -1,0 +1,77 @@
+program Imobiliario;
+
+{$O+}
+
+uses
+  Forms,
+  Windows,
+  SysUtils,
+  UDBFunctions in '..\Comuns\UDBFunctions.pas',
+  UcxGridFunctions in '..\Comuns\UcxGridFunctions.pas',
+  UAttribute in '..\Comuns\UAttribute.pas',
+  UPersistentObject in '..\Comuns\UPersistentObject.pas',
+  UDialogFunctions in '..\Comuns\UDialogFunctions.pas',
+  UControle in '..\Control\UControle.pas',
+  UfrmDialogoPesquisa in '..\View\UfrmDialogoPesquisa.pas' {frmDialogoPesquisa},
+  UStringFunctions in '..\Comuns\UStringFunctions.pas',
+  UdmComuns in '..\Comuns\UdmComuns.pas' {dmComuns: TDataModule},
+  Movimentacao in '..\Comuns\Movimentacao.pas' {frmMovimentacao},
+  Padrao in '..\Comuns\Padrao.pas' {frmPadrao},
+  UfrmPrincipal in '..\Comuns\UfrmPrincipal.pas' {frmPrincipal},
+  UfrmPrincipalImobiliario in '..\View\UfrmPrincipalImobiliario.pas' {frmPrincipalImobiliario},
+  OKCANCL1 in 'c:\program files\embarcadero\studio\16.0\ObjRepos\EN\DelphiWin32\OKCANCL1.PAS' {OKBottomDlg},
+  UfrmSelecionarCliente in '..\Comuns\UfrmSelecionarCliente.pas' {frmSelecionarCliente},
+  UCidade in '..\Model\UCidade.pas',
+  UfrmMovimentacaoCidades in '..\View\UfrmMovimentacaoCidades.pas' {frmMovimentacaoCidades},
+  UfrmCadastroCidades in '..\View\UfrmCadastroCidades.pas' {frmCadastroCidades},
+  UEstado in '..\Model\UEstado.pas',
+  UfrmMovimentacaoCliente in '..\View\UfrmMovimentacaoCliente.pas' {frmMovimentacaoCliente},
+  UCliente in '..\Model\UCliente.pas',
+  UfrmCadastroCliente in '..\View\UfrmCadastroCliente.pas' {frmCadastroCliente},
+  UBanco in '..\Model\UBanco.pas',
+  UAgencia in '..\Model\UAgencia.pas',
+  UClienteControle in '..\Control\UClienteControle.pas',
+  UfrmMovimentacaoBancos in '..\View\UfrmMovimentacaoBancos.pas' {frmMovimentacaoBancos},
+  UfrmCadastroBancos in '..\View\UfrmCadastroBancos.pas' {frmCadastroBancos},
+  UfrmMovimentacaoAgencias in '..\View\UfrmMovimentacaoAgencias.pas' {frmMovimentacaoAgencias},
+  UfrmCadastroAgencias in '..\View\UfrmCadastroAgencias.pas' {frmCadastroAgencias},
+  UfrmCadastroTelefone in '..\View\UfrmCadastroTelefone.pas' {frmCadastroTelefone},
+  UTelefone in '..\Model\UTelefone.pas',
+  UfrmSplashScreen in '..\View\UfrmSplashScreen.pas' {frmSplashScreen};
+
+{$R *.res}
+
+begin
+  Application.Title := 'Gerenciador Imobiliário';
+  Application.Initialize;
+  FormatSettings.ShortDateFormat := 'dd/MM/yyyy';
+
+  frmSplashScreen := TfrmSplashScreen.Create(Application);
+  frmSplashScreen.Show;
+  frmSplashScreen.Update;
+  frmSplashScreen.Refresh;
+  frmSplashScreen.FormStyle := fsNormal;
+
+  for i := 0 to 5000 do
+   frmSplashScreen.pgbStatus.Position := i;
+
+  try
+   Application.CreateForm(TfrmPrincipalImobiliario, frmPrincipalImobiliario);
+   Application.CreateForm(TdmComuns, dmComuns);
+   frmPrincipalImobiliario.Show;
+   frmPrincipalImobiliario.BringToFront;
+
+   frmSplashScreen.Hide;
+   frmSplashScreen.Free;
+  except
+    on E: Exception do
+    begin
+      Application.ShowMainForm := False;
+      if E.Message <> '' then
+        Application.ShowException(E);
+    end;
+  end;
+
+  Application.Run;
+
+end.

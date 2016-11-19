@@ -1,0 +1,34 @@
+unit UEstado;
+
+interface
+
+uses
+  UPersistentObject, UAttribute;
+
+type
+  [TTableName('ESTADOS')]
+  TEstado = class(TPersistentObject)
+  private
+    { private declarations }
+    FCodigoEstado:     Integer;
+    FNomeEstado:       String;
+    FUnidadeFederacao: String;
+    FCodigoPais:       Integer;
+  public
+    { public declarations }
+  published
+    { published declarations }
+    [FieldName('IDESTADO', True, True)]
+    property CodigoEstado:     Integer read FCodigoEstado     write FCodigoEstado;
+    [FieldName('NOMEESTADO')]
+    property NomeEstado:       String  read FNomeEstado       write FNomeEstado;
+    [FieldName('UNIDADEFEDERACAO')]
+    property UnidadeFederacao: String  read FUnidadeFederacao write FUnidadeFederacao;
+    [FieldName('IDPAIS', False, False, True)]
+    property CodigoPais:       Integer read FCodigoPais       write FCodigoPais;
+
+  end;
+
+implementation
+
+end.

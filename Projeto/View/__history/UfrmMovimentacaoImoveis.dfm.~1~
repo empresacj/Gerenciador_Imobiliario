@@ -1,0 +1,33 @@
+inherited frmMovimentacaoImoveis: TfrmMovimentacaoImoveis
+  Caption = 'Cadastro de Imoveis'
+  PixelsPerInch = 96
+  TextHeight = 13
+  inherited Panel: TPanel
+    inherited PanelBotoes: TPanel
+      inherited lblInsert: TcxLabel
+        AnchorX = 29
+        AnchorY = 44
+      end
+      inherited lblEditar: TcxLabel
+        AnchorX = 29
+        AnchorY = 97
+      end
+      inherited lblDeletar: TcxLabel
+        AnchorX = 29
+        AnchorY = 150
+      end
+      inherited lblFechar: TcxLabel
+        AnchorX = 29
+        AnchorY = 379
+      end
+      inherited lblAjuda: TcxLabel
+        AnchorX = 29
+        AnchorY = 326
+      end
+      inherited lblExtras: TcxLabel
+        AnchorX = 29
+        AnchorY = 273
+      end
+    end
+  end
+end

@@ -1,0 +1,10 @@
+unit UCidade;
+
+interface
+
+uses
+  UPersistentObject, UAttribute;
+
+implementation
+
+end.

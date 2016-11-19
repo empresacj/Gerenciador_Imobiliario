@@ -1,0 +1,413 @@
+unit UPersistentObject;
+
+interface
+
+uses
+  Classes, RTTI, StrUtils, Variants, UAttribute, SysUtils, DB, SqlExpr, UDBFunctions;
+
+type
+  TPersistentObject = class;
+  TPersistentObjectClass = class of TPersistentObject;
+  TInitObject = procedure(Obj: TPersistentObject) of object;
+
+  TPersistentObject = class
+  private
+    FSQLConnection: TSQLConnection;
+    FNew: Boolean;
+    function BuildInsertSQL: String;
+    function BuildUpdateSQL: String;
+    function BuildDeleteSQL: String;
+    
+    function GetValue(const PropName: TRTTIProperty; const ForeignKey: Boolean): String;
+    class procedure SetValue(PropName: TRTTIProperty; AValue: Variant; PersistentObject: TPersistentObject = nil);
+    
+    property SQLConnection: TSQLConnection read FSQLConnection write FSQLConnection;
+  protected
+    function GetNew: Boolean; virtual;
+    function Insert: Boolean;
+    function Update: Boolean;
+
+    class procedure SetPropertiesFromDataSet(DataSet: TDataSet;
+      PersistentObject: TPersistentObject); virtual;
+  public
+    constructor Create(const SQLConnection: TSQLConnection);
+    class procedure FromDataSet(DataSet: TDataSet; PersistentObject: TPersistentObject; OnInitObject: TInitObject);
+    class function NewInstanceFromDataSet(DataSet: TDataSet; SQLConnection: TSQLConnection): TPersistentObject; virtual;
+    property New: Boolean read GetNew write FNew;
+  published
+    function Delete: Boolean;
+    function Save:   Boolean;
+    function Find(const Filter: String): Boolean; virtual;
+  end;
+
+implementation
+
+{ TPersistentObject }
+
+function TPersistentObject.BuildDeleteSQL: String;
+var
+  Context: TRTTIContext;
+  PropType: TRTTIType;
+  PropName: TRTTIProperty;
+  Attribute: TCustomAttribute;
+  ObjQry: TSQLQuery;
+  SQL, sAux: String;
+begin
+  sAux    := '';
+  SQL     := '';
+  Context := TRTTIContext.Create;
+
+  try
+   PropType := Context.GetType(ClassType);
+
+   for Attribute in PropType.GetAttributes do
+    begin
+     if Attribute is TTableName then
+      SQL := Format('DELETE FROM %s', [TTableName(Attribute).Name]);
+    end;
+
+   SQL := SQL + ' WHERE ';
+
+   for PropName in PropType.GetProperties do
+    begin
+     for Attribute in PropName.GetAttributes do
+      begin
+       if Attribute is FieldName then
+        begin
+         if (FieldName(Attribute).PrimaryKey) then
+          begin
+           SQL := SQL + Format(' %s %s = :%s ', [sAux, FieldName(PropName).Name, GetValue(PropName,FieldName(Attribute).ForeignKey)]);
+           sAux := 'AND';
+          end;
+        end;
+      end;
+    end;
+
+   Result := SQL;
+  finally
+   Context.Free;
+  end;
+end;
+
+function TPersistentObject.BuildInsertSQL: String;
+var
+  Context: TRTTIContext;
+  PropType: TRTTIType;
+  PropName: TRTTIProperty;
+  Attribute: TCustomAttribute;
+  SQL, Field, Value, FieldID, TableName, Error: String;
+begin
+  Field := '';
+  Value := '';
+  Context := TRTTIContext.Create;
+
+  try
+   PropType := Context.GetType(ClassType);
+   for Attribute in PropType.GetAttributes do
+    begin
+     if Attribute is TTableName then
+      begin
+       SQL := Format('INSERT INTO %s', [TTableName(Attribute).Name]);
+       TableName := TTableName(Attribute).Name;
+      end;
+     end;
+
+   for PropName in PropType.GetProperties do
+    begin
+     for Attribute in PropName.GetAttributes do
+      begin
+       if Attribute is FieldName then
+        begin
+         if not (FieldName(Attribute).AutoInc) then
+          begin
+           Field := Field + FieldName(Attribute).Name + ',';
+           Value := Value + GetValue(PropName,FieldName(Attribute).ForeignKey) + ',';
+          end
+         else
+          FieldID := FieldName(Attribute).Name;
+         end;
+       end;
+     end;
+
+   Field := Copy(Field,1,Length(Field)-1);
+   Value := Copy(Value,1,Length(Value)-1);
+
+   Result := Format('%s(%s) VALUES (%s)', [SQL, Field, Value]);
+  finally
+   Context.Free;
+  end;
+end;
+
+function TPersistentObject.BuildUpdateSQL: String;
+var
+  Context: TRTTIContext;
+  PropType: TRTTIType;
+  PropName: TRTTIProperty;
+  Attribute: TCustomAttribute;
+  SQL, Field, Where, Error: String;
+begin
+  Field := '';
+  Context := TRttiContext.Create;
+
+  try
+   PropType := Context.GetType(ClassType);
+   for Attribute in PropType.GetAttributes do
+    begin
+     if Attribute is TTableName then
+      SQL := Format('UPDATE %s SET',[TTableName(Attribute).Name]);
+    end;
+
+   for PropName in PropType.GetProperties do
+    begin
+     for Attribute in PropName.GetAttributes do
+      begin
+       if Attribute is FieldName then
+        begin
+         if (not (FieldName(Attribute).AutoInc)) and (not (FieldName(Attribute).PrimaryKey)) then
+          Field := Field + FieldName(Attribute).Name + ' = ' + GetValue(PropName, FieldName(Attribute).ForeignKey) + ','
+         else if (FieldName(Attribute).PrimaryKey) then
+          Where := Where + Ifthen(Trim(where)='','',' AND ') + FieldName(Attribute).Name + ' = ' + GetValue(PropName,FieldName(Attribute).ForeignKey);
+        end;
+      end;
+    end;
+
+   Field := Copy(Field,1,Length(Field)-1);
+   Result := Format('%s %s WHERE %s', [SQL, Field, Where]);
+  finally
+   Context.Free;
+  end;
+end;
+
+constructor TPersistentObject.Create(const SQLConnection: TSQLConnection);
+begin
+  FSQLConnection := SQLConnection;
+  FNew := True;
+end;
+
+function TPersistentObject.Delete: Boolean;
+var
+  ObjQry: TSQLQuery;
+begin
+  Result := False;
+  ObjQry := TDBFunctions.SQLDataSet(TSQLQuery, Self.SQLConnection) as TSQLQuery;
+
+  try
+   ObjQry.SQL.Add(BuildDeleteSQL);
+   ObjQry.ExecSQL();
+
+   Result   := True;
+   Self.New := False;
+  finally
+   ObjQry.Free;
+  end;
+end;
+
+function TPersistentObject.Find(const Filter: String): Boolean;
+var
+  Context: TRTTIContext;
+  PropType: TRTTIType;
+  PropName: TRTTIProperty;
+  Attribute: TCustomAttribute;
+  ObjQry: TSQLQuery;
+begin
+  Result  := True;
+  Context := TRTTIContext.Create;
+  ObjQry  := TDBFunctions.SQLDataSet(TSQLQuery, Self.SQLConnection) as TSQLQuery;
+
+  try
+   PropType := Context.GetType(ClassType);
+
+   for Attribute in PropType.GetAttributes do
+    begin
+     if Attribute is TTableName then
+      ObjQry.SQL.Add(Format('SELECT * FROM %s', [TTableName(Attribute).Name]));
+    end;
+
+   if not SameText(Filter, '') then
+    ObjQry.SQL.Add(Format('WHERE %s', [Filter]));
+
+   ObjQry.Open;
+   Result := not ObjQry.IsEmpty;
+
+   if (Assigned(ObjQry)) and (ObjQry.RecordCount > 0) then
+    begin
+     with ObjQry do
+      begin
+       First;
+       while not EOF do
+        begin
+         for PropName in PropType.GetProperties do
+          begin
+           for Attribute in PropName.GetAttributes do
+            begin
+             if Attribute is FieldName then
+              begin
+               if Assigned(FindField(FieldName(Attribute).Name)) then
+                SetValue(PropName, FieldByName(FieldName(Attribute).Name).Value, Self);
+              end;
+            end;
+          end;
+         Next;
+        end;
+      end;
+    end
+   else
+    Result := False;
+  finally
+   ObjQry.Free;
+   Context.Free;
+  end;
+end;
+
+class procedure TPersistentObject.FromDataSet(DataSet: TDataSet;
+  PersistentObject: TPersistentObject; OnInitObject: TInitObject);
+var
+  i: Integer;
+begin
+  if DataSet.Active then
+   begin
+    if Assigned(OnInitObject) then
+     OnInitObject(PersistentObject);
+
+    SetPropertiesFromDataSet(DataSet, PersistentObject);
+   end;
+end;
+
+function TPersistentObject.GetNew: Boolean;
+begin
+  Result := FNew;
+end;
+
+function TPersistentObject.GetValue(const PropName: TRTTIProperty;
+  const ForeignKey: Boolean): String;
+begin
+  if SameText(PropName.PropertyType.Name, 'TDateTime') then
+   Result := StringReplace(QuotedStr(PropName.GetValue(Self).ToString), '/', '.')
+  else
+   begin
+    case PropName.PropertyType.TypeKind of
+     tkUnknown, tkInteger, tkInt64: Result := PropName.GetValue(Self).ToString;
+     tkEnumeration: Result := IntToStr(Integer(PropName.GetValue(Self).AsBoolean));
+     tkChar, tkString, tkWChar, tkLString,
+     tkWString, tkUString: Result := QuotedStr(PropName.GetValue(Self).ToString);
+     tkFloat: Result := StringReplace(FormatFloat('0.00',PropName.GetValue(Self).AsCurrency)
+                                      ,FormatSettings.DecimalSeparator,'.',[rfReplaceAll,rfIgnoreCase]);
+    end;
+   end;
+
+  if (SameText(Result, '0') or SameText(Result, '''''')) then
+    Result := 'NULL';
+end;
+
+function TPersistentObject.Insert: Boolean;
+var
+  ObjQry: TSQLQuery;
+begin
+  Result := False;
+  ObjQry := TDBFunctions.SQLDataSet(TSQLQuery, Self.SQLConnection) as TSQLQuery;
+
+  try
+   ObjQry.SQL.Add(BuildInsertSQL);
+   ObjQry.ExecSQL();
+   
+   Result   := True;
+   Self.New := False;
+  finally
+   ObjQry.Free;
+  end;
+end;
+
+class function TPersistentObject.NewInstanceFromDataSet(DataSet: TDataSet;
+  SQLConnection: TSQLConnection): TPersistentObject;
+begin
+  if DataSet.Active then
+   begin
+    Result := Self.Create(SQLConnection);
+    Self.FromDataSet(DataSet, Result, nil);
+   end
+  else Result := nil;
+end;
+
+function TPersistentObject.Save: Boolean;
+begin
+  if Self.New then Result := Self.Insert
+  else Result := Self.Update;
+end;
+
+class procedure TPersistentObject.SetPropertiesFromDataSet(DataSet: TDataSet;
+  PersistentObject: TPersistentObject);
+var
+  i: Integer;
+  sCampo: String;
+  Context: TRTTIContext;
+  PropName: TRTTIProperty;
+  PropType: TRTTIType;
+  Attribute: TCustomAttribute;
+begin
+  Context := TRTTIContext.Create;
+
+  try
+   PropType := Context.GetType(PersistentObject.ClassType);
+
+   for i := 0 to DataSet.FieldCount - 1 do
+    begin
+     if not DataSet.Fields[i].IsNull then
+      begin
+       for PropName in PropType.GetProperties do
+        begin
+         for Attribute in PropName.GetAttributes do
+          begin
+           if Attribute is FieldName then
+            begin
+             if SameText(FieldName(Attribute).Name, DataSet.Fields[i].FieldName) then
+              SetValue(PropName, DataSet.Fields[i].Value, PersistentObject);
+            end;
+          end;
+        end;
+      end;
+    end;
+
+  finally
+   Context.Free;
+  end;
+end;
+
+class procedure TPersistentObject.SetValue(PropName: TRTTIProperty; AValue: Variant;
+  PersistentObject: TPersistentObject);
+var
+  V: TValue;
+  w: Word;
+begin
+  w := VarType(AValue);
+  case w of
+   271: v := StrToFloat(AValue);
+   272: v := StrToDateTime(AValue);
+   3: v := StrToInt(AValue);
+   else
+   begin
+    PropName.SetValue(PersistentObject, TValue.FromVariant(AValue));
+    Exit;
+   end;
+  end;
+
+  PropName.SetValue(PersistentObject, v);
+end;
+
+function TPersistentObject.Update: Boolean;
+var
+  ObjQry: TSQLQuery;
+begin
+  Result := False;
+  ObjQry := TDBFunctions.SQLDataSet(TSQLQuery, Self.SQLConnection) as TSQLQuery;
+
+  try
+   ObjQry.SQL.Add(BuildUpdateSQL);
+   ObjQry.ExecSQL();
+
+   Result   := True;
+  finally
+   ObjQry.Free;
+  end;
+end;
+
+end.

@@ -1,0 +1,48 @@
+unit UfrmTeste;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, cxGraphics, cxControls, cxLookAndFeels,
+  cxLookAndFeelPainters, cxContainer, cxEdit, dxSkinsCore,
+  dxSkinDevExpressStyle, cxGroupBox, cxTextEdit, Vcl.ExtCtrls, Vcl.Buttons;
+
+type
+  TfrmTeste = class(TForm)
+    pnl: TPanel;
+    pnlBotoes: TPanel;
+    btnExcluir: TSpeedButton;
+    btnIncluir: TSpeedButton;
+    btnEditar: TSpeedButton;
+    btnAjuda: TSpeedButton;
+    btnFechar: TSpeedButton;
+    btnFirst: TSpeedButton;
+    btnPrevious: TSpeedButton;
+    btnNext: TSpeedButton;
+    btnLast: TSpeedButton;
+    btnImprimir: TSpeedButton;
+    btnPesquisar: TSpeedButton;
+    btnStatus: TSpeedButton;
+    btnExtras: TSpeedButton;
+    btnDica: TSpeedButton;
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmTeste: TfrmTeste;
+
+implementation
+
+{$R *.dfm}
+
+procedure TfrmTeste.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  frmTeste := nil;
+end;
+
+end.

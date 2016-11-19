@@ -1,0 +1,223 @@
+object frmSelecionarCliente: TfrmSelecionarCliente
+  Left = 0
+  Top = 0
+  BorderStyle = bsDialog
+  Caption = 'Selecionar Cliente'
+  ClientHeight = 221
+  ClientWidth = 594
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poScreenCenter
+  OnClose = FormClose
+  OnShow = FormShow
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Panel1: TPanel
+    Left = 0
+    Top = 0
+    Width = 594
+    Height = 221
+    Align = alClient
+    BevelInner = bvLowered
+    BevelWidth = 2
+    Caption = 'Panel'
+    ParentColor = True
+    TabOrder = 0
+    ExplicitWidth = 600
+    ExplicitHeight = 250
+    object grid: TcxGrid
+      Left = 4
+      Top = 4
+      Width = 586
+      Height = 213
+      Align = alClient
+      TabOrder = 0
+      ExplicitLeft = 5
+      ExplicitTop = 31
+      ExplicitWidth = 592
+      ExplicitHeight = 219
+      object gridDBTableView: TcxGridDBTableView
+        OnDblClick = gridDBTableViewDblClick
+        OnKeyDown = gridDBTableViewKeyDown
+        OnKeyUp = gridDBTableViewKeyUp
+        OnMouseUp = gridDBTableViewMouseUp
+        Navigator.Buttons.CustomButtons = <>
+        OnCustomDrawCell = gridDBTableViewCustomDrawCell
+        DataController.DataSource = dtsCliente
+        DataController.Summary.DefaultGroupSummaryItems = <>
+        DataController.Summary.FooterSummaryItems = <>
+        DataController.Summary.SummaryGroups = <>
+        OptionsBehavior.IncSearch = True
+        OptionsData.Deleting = False
+        OptionsData.DeletingConfirmation = False
+        OptionsData.Editing = False
+        OptionsData.Inserting = False
+        OptionsSelection.InvertSelect = False
+        OptionsView.NoDataToDisplayInfoText = 'N'#227'o h'#225' dados'
+        OptionsView.ColumnAutoWidth = True
+        OptionsView.GroupByBox = False
+        OptionsView.Indicator = True
+        OnColumnHeaderClick = gridDBTableViewColumnHeaderClick
+        object gridDBTableViewColumn1: TcxGridDBColumn
+          Caption = 'C'#243'digo'
+          DataBinding.FieldName = 'IDCLIENTE'
+          PropertiesClassName = 'TcxCurrencyEditProperties'
+          Properties.DisplayFormat = '#'
+          Width = 67
+        end
+        object gridDBTableViewColumn2: TcxGridDBColumn
+          Caption = 'Nome'
+          DataBinding.FieldName = 'NOMECLIENTE'
+          PropertiesClassName = 'TcxTextEditProperties'
+          Width = 372
+        end
+        object gridDBTableViewColumn3: TcxGridDBColumn
+          Caption = 'Inscri'#231#227'o'
+          DataBinding.FieldName = 'INSCRICAO'
+          PropertiesClassName = 'TcxTextEditProperties'
+          Width = 139
+        end
+      end
+      object gridLevel: TcxGridLevel
+        GridView = gridDBTableView
+      end
+    end
+  end
+  object ActionList: TActionList
+    Left = 80
+    Top = 72
+    object ActionListConfirm: TAction
+      OnExecute = ActionListConfirmExecute
+    end
+    object ActionListClose: TAction
+      OnExecute = ActionListCloseExecute
+    end
+  end
+  object cdsCliente: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    Left = 142
+    Top = 72
+    object cdsClienteIDCLIENTE: TIntegerField
+      FieldName = 'IDCLIENTE'
+      Required = True
+    end
+    object cdsClienteNOMECLIENTE: TStringField
+      FieldName = 'NOMECLIENTE'
+      Required = True
+      Size = 100
+    end
+    object cdsClienteTIPOINSCRICAO: TIntegerField
+      FieldName = 'TIPOINSCRICAO'
+      Required = True
+    end
+    object cdsClienteINSCRICAO: TStringField
+      FieldName = 'INSCRICAO'
+      Required = True
+      Size = 18
+    end
+    object cdsClienteIDTIPOLOGRADOURO: TIntegerField
+      FieldName = 'IDTIPOLOGRADOURO'
+      Required = True
+    end
+    object cdsClienteENDERECO: TStringField
+      FieldName = 'ENDERECO'
+      Required = True
+      Size = 80
+    end
+    object cdsClienteNUMERO: TStringField
+      FieldName = 'NUMERO'
+      Required = True
+      Size = 10
+    end
+    object cdsClienteCOMPLEMENTO: TStringField
+      FieldName = 'COMPLEMENTO'
+      Size = 80
+    end
+    object cdsClienteBAIRRO: TStringField
+      FieldName = 'BAIRRO'
+      Required = True
+      Size = 50
+    end
+    object cdsClienteIDCIDADE: TIntegerField
+      FieldName = 'IDCIDADE'
+      Required = True
+    end
+    object cdsClienteCEP: TStringField
+      FieldName = 'CEP'
+      Size = 9
+    end
+    object cdsClienteDATANASCIMENTO: TDateField
+      FieldName = 'DATANASCIMENTO'
+      Required = True
+    end
+    object cdsClienteSEXO: TStringField
+      FieldName = 'SEXO'
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object cdsClienteESTADOCIVIL: TStringField
+      FieldName = 'ESTADOCIVIL'
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object cdsClienteEMAILPESSOAL: TStringField
+      FieldName = 'EMAILPESSOAL'
+      Size = 100
+    end
+    object cdsClienteEMAILCOMERCIAL: TStringField
+      FieldName = 'EMAILCOMERCIAL'
+      Size = 100
+    end
+    object cdsClienteRACA: TStringField
+      FieldName = 'RACA'
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object cdsClienteCODIGOAGENCIA: TStringField
+      FieldName = 'CODIGOAGENCIA'
+      Size = 10
+    end
+    object cdsClienteIDBANCO: TIntegerField
+      FieldName = 'IDBANCO'
+    end
+    object cdsClienteOPERACAO: TStringField
+      FieldName = 'OPERACAO'
+      FixedChar = True
+      Size = 3
+    end
+    object cdsClienteTIPOCONTA: TStringField
+      FieldName = 'TIPOCONTA'
+      FixedChar = True
+      Size = 1
+    end
+    object cdsClienteCONTA: TStringField
+      FieldName = 'CONTA'
+      Size = 15
+    end
+    object cdsClienteDIGITOVERIFICADOR: TStringField
+      FieldName = 'DIGITOVERIFICADOR'
+      FixedChar = True
+      Size = 2
+    end
+    object cdsClienteSTATUSCLIENTE: TStringField
+      FieldName = 'STATUSCLIENTE'
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+  end
+  object dtsCliente: TDataSource
+    DataSet = cdsCliente
+    Left = 195
+    Top = 72
+  end
+end

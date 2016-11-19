@@ -1,0 +1,21 @@
+inherited frmCadastroBancos: TfrmCadastroBancos
+  Caption = 'frmCadastroBancos'
+  ExplicitWidth = 570
+  ExplicitHeight = 328
+  PixelsPerInch = 96
+  TextHeight = 13
+  inherited pnlBotoes: TPanel
+    inherited lblSalvar: TcxLabel
+      AnchorX = 35
+      AnchorY = 47
+    end
+  end
+  inherited lblCancelar: TcxLabel
+    AnchorX = 95
+    AnchorY = 47
+  end
+  inherited lblImprmir: TcxLabel
+    AnchorX = 529
+    AnchorY = 47
+  end
+end

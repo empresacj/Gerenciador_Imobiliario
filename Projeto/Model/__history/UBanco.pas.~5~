@@ -1,0 +1,30 @@
+unit UBanco;
+
+interface
+
+uses
+  UPersistentObject, UAttribute;
+
+type
+  [TTableName('BANCOS')]
+  TBanco = class(TPersistentObject)
+  private
+    FCodigoBanco: Integer;
+    FNomeBanco: String;
+    FSiteBanco: String;
+    { private declarations }
+  protected
+    { protected declarations }
+  public
+    { public declarations }
+  published
+    { published declarations }
+    [FieldName('IDBANCO', True, True)]
+    property CodigoBanco: Integer read FCodigoBanco write FCodigoBanco;
+    property NomeBanco:   String  read FNomeBanco   write FNomeBanco;
+    property SiteBanco:   String  read FSiteBanco   write FSiteBanco;
+  end;
+
+implementation
+
+end.

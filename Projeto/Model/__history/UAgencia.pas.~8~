@@ -1,0 +1,43 @@
+unit UAgencia;
+
+interface
+
+uses
+  UPersistentObject, UAttribute;
+
+type
+  [TTableName('AGENCIAS')]
+  TAgencia = class(TPersistentObject)
+  private
+    FCodigoAgencia: String;
+    FCodigoBanco: Integer;
+    FNomeAgencia: String;
+    FDigitoVerificador: String;
+    FEndereco: String;
+    FNumero: String;
+    FBairro: String;
+    FCodigoCidade: Integer;
+    FEmailAgencia: String;
+    { private declarations }
+  protected
+    { protected declarations }
+  public
+    { public declarations }
+  published
+    { published declarations }
+    [FieldName('CODIGOAGENCIA', True)]
+    property CodigoAgencia:     String  read FCodigoAgencia     write FCodigoAgencia;
+    [FieldName('IDBANCO', True, False, True)]
+    property CodigoBanco:       Integer read FCodigoBanco       write FCodigoBanco;
+    property NomeAgencia:       String  read FNomeAgencia       write FNomeAgencia;
+    property DigitoVerificador: String  read FDigitoVerificador write FDigitoVerificador;
+    property Endereco:          String  read FEndereco          write FEndereco;
+    property Numero:            String  read FNumero            write FNumero;
+    property Bairro:            String  read FBairro            write FBairro;
+    property CodigoCidade:      Integer read FCodigoCidade      write FCodigoCidade;
+    property EmailAgencia:      String  read FEmailAgencia      write FEmailAgencia;
+  end;
+
+implementation
+
+end.

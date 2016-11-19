@@ -1,0 +1,27 @@
+unit UCidade;
+
+interface
+
+uses
+  UPersistentObject, UAttribute;
+
+type
+  [TTableName('CLIENTES')]
+  TCidade = class(TPersistentObject)
+  private
+    { private declarations }
+    FCodigoCidade: Integer;
+    FNomeCidade:   String;
+    FCodigoEstado: Integer;
+  public
+    { public declarations }
+  published
+    { published declarations }
+    property CodigoCidade: Integer read FCodigoCidade write FCodigoCidade;
+    property NomeCidade:   String  read FNomeCidade   write FNomeCidade;
+    property CodigoEstado: Integer read FCodigoEstado write FCodigoEstado;
+  end;
+
+implementation
+
+end.

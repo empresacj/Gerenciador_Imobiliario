@@ -1,0 +1,51 @@
+unit UDBFunctions;
+
+interface
+
+uses
+  DBClient, DB, SimpleDS, SqlExpr, Classes;
+
+type
+  TCustomSQLDataSetClass = class of TCustomSQLDataSet;
+
+  TDBFunctions = class
+  public
+    { Public declarations }
+    class procedure GetClientDataSet(DataSet: TDataSet; ClientDataSet: TClientDataSet); overload;
+  published
+    { Published declaration }
+    class function SQLDataSet(SQLDataSetClass: TCustomSQLDataSetClass;
+      SQLConnection: TSQLConnection): TCustomSQLDataSet;
+  end;
+
+implementation
+
+uses Classes, SysUtils, Provider;
+
+{ TCdsFunctions }
+
+class procedure TDBFunctions.GetClientDataSet(DataSet: TDataSet;
+  ClientDataSet: TClientDataSet);
+var
+  DataSetProvider: TDataSetProvider;
+begin
+  if ClientDataSet.Active then ClientDataSet.Close;
+  try
+   DataSetProvider         := TDataSetProvider.Create(nil);
+   DataSetProvider.DataSet := DataSet;
+   ClientDataSet.SetProvider(DataSetProvider);
+   ClientDataSet.Open;
+   ClientDataSet.SetProvider(nil);
+  finally
+   DataSetProvider.Free;
+  end;
+end;
+
+class function TDBFunctions.SQLDataSet(SQLDataSetClass: TCustomSQLDataSetClass;
+  SQLConnection: TSQLConnection): TCustomSQLDataSet;
+begin
+  Result := SQLDataSetClass.Create(nil);
+  Result.SQLConnection := SQLConnection;
+end;
+
+end.

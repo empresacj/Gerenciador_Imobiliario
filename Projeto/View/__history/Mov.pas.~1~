@@ -1,0 +1,43 @@
+unit Mov;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, Menus, Buttons, ExtCtrls, StdCtrls, DB, SqlExpr,
+  UfraExportGridData, ImgList, DBClient,Padrao, cxControls, cxContainer,
+  cxEdit, cxGraphics, cxGridDBTableView, cxDBTL, cxTL, cxGrid,
+  cxGridCustomTableView, cxPC, Clipbrd;
+
+type
+  TfrmMov = class(TForm)
+    dsMov: TDataSource;
+    pnl: TPanel;
+    pnlBotoes: TPanel;
+    btnExcluir: TSpeedButton;
+    btnIncluir: TSpeedButton;
+    btnEditar: TSpeedButton;
+    btnAjuda: TSpeedButton;
+    btnFechar: TSpeedButton;
+    btnFirst: TSpeedButton;
+    btnPrevious: TSpeedButton;
+    btnNext: TSpeedButton;
+    btnLast: TSpeedButton;
+    btnImprimir: TSpeedButton;
+    btnPesquisar: TSpeedButton;
+    btnStatus: TSpeedButton;
+    btnExtras: TSpeedButton;
+    btnDica: TSpeedButton;
+  private
+  public
+  end;
+
+var
+  frmMov: TfrmMov;
+
+implementation
+
+
+{$R *.dfm}
+
+end.

@@ -1,0 +1,162 @@
+unit UdmComuns;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, Forms, Controls, dxBar, Winapi.Windows,
+  Data.DB, Data.SqlExpr, Data.DBXFirebird;
+
+type
+  TdmComuns = class(TDataModule)
+    SQLConnection: TSQLConnection;
+  private
+    FWindowsBar: TdxBar;
+    { Private declarations }
+    function GetWindowButtonCaption(const OriginalCaption: String): String;
+    procedure AddToWindowsList(ObjForm: TForm);
+    procedure OnWindowButtonClick(Sender: TObject);
+  public
+    { Public declarations }
+    procedure RemoveFromWindowsList(ObjForm: TForm);
+    function ExecForm(InstanceClass: TComponentClass; var Reference): Boolean;
+    constructor Create(AOwner: TComponent); override;
+
+    class function GetCurrentWindowRect(var Rect: TRect): boolean; static;
+  published
+    { Published declarations }
+    property WindowsBar: TdxBar read FWindowsBar write FWindowsBar;
+  end;
+
+var
+  dmComuns: TdmComuns;
+  ipCodigoCliente: Integer;
+  function SelecionaCliente: Boolean;
+
+implementation
+
+uses
+  UfrmPrincipalImobiliario, Math, UfrmSelecionarCliente;
+
+{ %CLASSGROUP 'Vcl.Controls.TControl' }
+
+{$R *.dfm}
+{ TdmComuns }
+
+procedure TdmComuns.AddToWindowsList(ObjForm: TForm);
+var
+  BarItemButton: TdxBarItemLink;
+  index: Integer;
+begin
+  if not Assigned(WindowsBar) then
+   Exit;
+
+  for index := 0 to WindowsBar.ItemLinks.Count - 1 do
+   if TForm(WindowsBar.ItemLinks[index].Item.Tag) = ObjForm then
+    Exit;
+
+  BarItemButton := WindowsBar.ItemLinks.AddButton;
+  with (BarItemButton.Item as TdxBarButton) do
+   begin
+    ButtonStyle := bsChecked;
+    GroupIndex  := 100;
+    Caption     := GetWindowButtonCaption(ObjForm.Caption);
+    OnClick     := OnWindowButtonClick;
+    Align       := iaLeft;
+    Down        := True;
+    Tag         := Integer(ObjForm);
+   end;
+
+  WindowsBar.ItemLinks.Move(WindowsBar.ItemLinks.Count-1, WindowsBar.ItemLinks.Count-2);
+end;
+
+constructor TdmComuns.Create(AOwner: TComponent);
+begin
+  inherited;
+  FWindowsBar := frmPrincipalImobiliario.barMenu;
+end;
+
+function TdmComuns.ExecForm(InstanceClass: TComponentClass;
+  var Reference): Boolean;
+begin
+  Result := False;
+
+  if bCliente then
+   if not SelecionaCliente then Exit;
+
+  if TForm(Reference) = nil then
+    Application.CreateForm(InstanceClass, Reference);
+
+  if TForm(Reference).FormStyle = fsMDIChild then
+   begin
+    AddToWindowsList(TForm(Reference));
+
+    TForm(Reference).BorderStyle := bsSizeable;
+    TForm(Reference).BorderIcons := [biSystemMenu, biMaximize, biMinimize];
+    TForm(Reference).WindowState := wsMaximized;
+    TForm(Reference).Show;
+    Result := True;
+   end
+  else
+   Result := TForm(Reference).ShowModal = mrOK;
+end;
+
+class function TdmComuns.GetCurrentWindowRect(var Rect: TRect): boolean;
+var
+  aWin: HWND;
+  aRect: TRect;
+begin
+  aWin := GetFocus;
+
+  Result := (aWin <> 0) and GetWindowRect(aWin, Rect);
+end;
+
+function TdmComuns.GetWindowButtonCaption(
+  const OriginalCaption: String): String;
+begin
+  Result := StringReplace(OriginalCaption, 'Cadastro de ', '', [rfIgnoreCase]);
+  Result := StringReplace(Result, 'Cadastro do ', '', [rfIgnoreCase]);
+end;
+
+procedure TdmComuns.OnWindowButtonClick(Sender: TObject);
+var
+  ObjForm: TForm;
+begin
+  ObjForm := TForm(Pointer(TComponent(Sender).Tag));
+
+  if ObjForm.WindowState = wsMinimized then
+   ObjForm.WindowState := wsNormal;
+
+  ObjForm.Show;
+  ObjForm.BringToFront;
+end;
+
+function SelecionaCliente: Boolean;
+begin
+  Result := (ipCodigoCliente > 0) or TfrmSelecionarCliente.DialogSelect(ipCodigoCliente);
+end;
+
+procedure TdmComuns.RemoveFromWindowsList(ObjForm: TForm);
+var
+  index: Integer;
+  ObjFormAux: TForm;
+begin
+  if not Assigned(WindowsBar) then
+   Exit;
+
+  for index := 0 to WindowsBar.ItemLinks.Count - 1 do
+   if TForm(WindowsBar.ItemLinks[index].Item.Tag) = ObjForm then
+    begin
+     WindowsBar.ItemLinks[index].Free;
+     Break;
+    end;
+
+  if WindowsBar.ItemLinks.Count >= 1 then
+   begin
+    index := Max(index - 1, 0);
+
+    ObjFormAux := TForm(WindowsBar.ItemLinks[index].Item.Tag);
+    ObjFormAux.WindowState := wsMaximized;
+  end;
+end;
+
+end.
